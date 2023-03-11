@@ -4,8 +4,11 @@ import { SafeAuthKit, SafeAuthProviderType } from "@safe-global/auth-kit";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
 import { AppContainer } from "@/components/AppContainer";
+import SafeAuthContext from "@/contexts/SafeAuthContext";
+import { useContext } from "react";
 
 export default function Home() {
+    const ctx = useContext(SafeAuthContext);
     return (
         <AppContainer>
             <Head>
@@ -22,6 +25,7 @@ export default function Home() {
             </Head>
             <Login />
             <Logout />
+            <button onClick={() => console.log(ctx)}>Log Context</button>
             <main className={styles.main}>Hello World</main>
         </AppContainer>
     );
