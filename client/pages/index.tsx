@@ -3,10 +3,11 @@ import styles from "@/styles/Home.module.css";
 import { SafeAuthKit, SafeAuthProviderType } from "@safe-global/auth-kit";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
+import { AppContainer } from "@/components/AppContainer";
 
 export default function Home() {
     return (
-        <>
+        <AppContainer>
             <Head>
                 <title>Gumnaam</title>
                 <meta
@@ -22,6 +23,6 @@ export default function Home() {
             <Login />
             <Logout />
             <main className={styles.main}>Hello World</main>
-        </>
+        </AppContainer>
     );
 }

@@ -1,4 +1,4 @@
-import SafeAuthContext from "@/context/SafeAuthContext";
+import SafeAuthContext from "@/contexts/SafeAuthContext";
 import { SafeAuthKit, SafeAuthProviderType } from "@safe-global/auth-kit";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { useContext } from "react";
