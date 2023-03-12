@@ -289,7 +289,14 @@ export function HeaderTabsColored() {
                             </Menu.Dropdown>
                         </Menu>
 
-                        {!ctx.provider ? <Login /> : <Logout />}
+                        {!ctx.safeAuthSignInResponse?.eoa ? (
+                            <Login />
+                        ) : (
+                            <>
+                                <Text>{ctx.safeAuthSignInResponse.eoa}</Text>
+                                <Logout />
+                            </>
+                        )}
                     </Group>
                 </Group>
             </Container>

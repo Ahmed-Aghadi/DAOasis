@@ -13,7 +13,6 @@ import SafeAuthContext, {
 
 export default function App({ Component, pageProps }: AppProps) {
     const ctx = useContext(SafeAuthContext);
-
     return (
         <SafeAuthContextProvider>
             <Component {...pageProps} />
