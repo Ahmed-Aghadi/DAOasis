@@ -14,6 +14,7 @@
     "@mantine/hooks": "^6.0.1",
     "@polybase/client": "^0.3.32",
     "@safe-global/auth-kit": "^0.1.0-alpha.2",
+    "@safe-global/safe-core-sdk": "^3.3.2",
     "@safe-global/safe-react-components": "^2.0.3",
     "@tabler/icons-react": "^2.10.0",
     "@types/node": "18.15.0",
