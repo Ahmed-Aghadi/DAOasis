@@ -13,6 +13,7 @@
     "@mantine/core": "^6.0.1",
     "@mantine/ds": "^6.0.2",
     "@mantine/hooks": "^6.0.1",
+    "@mantine/prism": "^6.0.2",
     "@polybase/client": "^0.3.32",
     "@safe-global/auth-kit": "^0.1.0-alpha.2",
     "@safe-global/safe-core-sdk": "^3.3.2",

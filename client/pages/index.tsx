@@ -1,11 +1,11 @@
 import Head from "next/head";
-import styles from "@/styles/Home.module.css";
-import { SafeAuthKit, SafeAuthProviderType } from "@safe-global/auth-kit";
+import {SafeAuthKit, SafeAuthProviderType} from "@safe-global/auth-kit";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
-import { Layout } from "@/components/Layout";
+import {Layout} from "@/components/Layout";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import { useContext } from "react";
+import {useContext} from "react";
+import {HeroTitle} from "@/components/Hero";
 
 export default function Home() {
     const ctx = useContext(SafeAuthContext);
@@ -83,7 +83,7 @@ export default function Home() {
     };
 
     return (
-        <Layout>
+        <>
             <Head>
                 <title>StakeSquadron</title>
                 <meta
@@ -94,19 +94,21 @@ export default function Home() {
                     name="viewport"
                     content="width=device-width, initial-scale=1"
                 />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon.ico"/>
             </Head>
-            <Login />
-            <Logout />
-            <button onClick={() => console.log(ctx)}>Log Context</button>
-            {/* <button onClick={() => createCollection()}>
-                Create Collection
-            </button> */}
-            <button onClick={() => getAllRecords()}>Get All Records</button>
-            <button onClick={() => getRecords()}>Get Records</button>
-            <button onClick={() => createRecord()}>Create Record</button>
-            <button onClick={() => updateRecord()}>Update Record</button>
-            <main className={styles.main}>Hello World</main>
-        </Layout>
+            <HeroTitle />
+        </>
     );
 }
+
+// <Login/>
+// <Logout/>
+// <button onClick={() => console.log(ctx)}>Log Context</button>
+// {/* <button onClick={() => createCollection()}>
+//                 Create Collection
+//             </button> */}
+// <button onClick={() => getAllRecords()}>Get All Records</button>
+// <button onClick={() => getRecords()}>Get Records</button>
+// <button onClick={() => createRecord()}>Create Record</button>
+// <button onClick={() => updateRecord()}>Update Record</button>
+// <main>Hello World</main>
