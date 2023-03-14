@@ -1,7 +1,7 @@
 import { AppShell, Navbar, Header } from "@mantine/core";
 import { HeaderTabsColored } from "./Headers";
 
-export function AppContainer({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {
     // Navbar and Header will not be rendered when hidden prop is set
     return (
         <AppShell
