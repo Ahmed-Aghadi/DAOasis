@@ -1,11 +1,11 @@
 import Head from "next/head";
-import {SafeAuthKit, SafeAuthProviderType} from "@safe-global/auth-kit";
+import { SafeAuthKit, SafeAuthProviderType } from "@safe-global/auth-kit";
 import Login from "@/components/Login";
 import Logout from "@/components/Logout";
-import {Layout} from "@/components/Layout";
+import { Layout } from "@/components/Layout";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import {useContext} from "react";
-import {HeroTitle} from "@/components/Hero";
+import { useContext } from "react";
+import { HeroTitle } from "@/components/Hero";
 
 export default function Home() {
     const ctx = useContext(SafeAuthContext);
@@ -86,15 +86,12 @@ export default function Home() {
         <>
             <Head>
                 <title>StakeSquadron</title>
-                <meta
-                    name="description"
-                    content="A multi-sig dao"
-                />
+                <meta name="description" content="A multi-sig dao" />
                 <meta
                     name="viewport"
                     content="width=device-width, initial-scale=1"
                 />
-                <link rel="icon" href="/favicon.ico"/>
+                <link rel="icon" href="/favicon.ico" />
             </Head>
             <HeroTitle />
         </>
