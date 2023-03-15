@@ -15,6 +15,6 @@ export const getRpc = (chainId: string) => {
         case '0x1a4':
             return 'https://endpoints.omniatech.io/v1/op/goerli/public'
         default:
-            return 'https://rpc.ankr.com/gnosis'
+            return 'https://rpc.ankr.com/polygon_mumbai'
     }
 }
