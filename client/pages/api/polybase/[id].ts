@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from "next";
+import type {NextApiRequest, NextApiResponse} from "next";
 import {
     Collection,
     CollectionList,
     CollectionRecordResponse,
     Polybase,
 } from "@polybase/client";
-import { ethPersonalSign } from "@polybase/eth";
-import { ethers } from "ethers";
+import {ethPersonalSign} from "@polybase/eth";
+import {ethers} from "ethers";
 
 type Data = {
     response: CollectionList<any> | CollectionRecordResponse<any> | string;
@@ -66,23 +66,24 @@ export default async function handler(
 
     if (req.method === "GET") {
         const id = req.query.id;
+        console.log("id", id)
         // Get a record
         const recordData = await db
             .collection("User")
             .record(id as string)
             .get();
-        res.status(200).json({ response: recordData });
+        res.status(200).json({response: recordData});
     } else if (req.method === "POST") {
         const id = req.query.id;
         // Create a record
         const response = await db.collection("User").create([id as string]);
         // console.log(response);
-        res.status(200).json({ response: response });
+        res.status(200).json({response: response});
     } else if (req.method === "PATCH") {
         const id = req.query.id;
-        const { name, description, image } = req.body;
+        const {name, description, image} = req.body;
         if (!name || !description || !image) {
-            res.status(400).json({ response: "Missing required fields" });
+            res.status(400).json({response: "Missing required fields"});
             return;
         }
         // Update a record
@@ -90,9 +91,9 @@ export default async function handler(
             .collection("User")
             .record(id as string)
             .call("updateRecord", [name, description, image]);
-        res.status(200).json({ response: recordData });
+        res.status(200).json({response: recordData});
     }
 
     // invalid method
-    res.status(400).json({ response: "Invalid method" });
+    res.status(400).json({response: "Invalid method"});
 }

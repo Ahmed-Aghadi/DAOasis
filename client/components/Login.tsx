@@ -1,17 +1,45 @@
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import { SafeEventEmitterProvider } from "@web3auth/base";
-import { useContext } from "react";
+import {SafeEventEmitterProvider} from "@web3auth/base";
+import {useContext} from "react";
+import {loginStyles} from "@/styles/login.styles";
+import {notifications} from "@mantine/notifications";
+
 
 export default function Login() {
     const ctx = useContext(SafeAuthContext);
+    const {classes} = loginStyles();
     const login = async () => {
         if (!ctx.safeAuth) return;
+        notifications.show({
+            id: "login",
+            title: "Logging in...",
+            message: "Please wait...",
+            autoClose: false,
+            loading: true,
+        })
+        try {
+            const response = await ctx.safeAuth.signIn();
+            console.log("SIGN IN RESPONSE: ", response);
 
-        const response = await ctx.safeAuth.signIn();
-        console.log("SIGN IN RESPONSE: ", response);
-
-        ctx.setSafeAuthSignInResponse(response);
-        ctx.setProvider(ctx.safeAuth.getProvider() as SafeEventEmitterProvider);
+            ctx.setSafeAuthSignInResponse(response);
+            ctx.setProvider(ctx.safeAuth.getProvider() as SafeEventEmitterProvider);
+            notifications.update({
+                id: "login",
+                title: "Logged in",
+                message: "You are now logged in",
+                autoClose: true,
+                color: "green",
+            })
+        } catch (e) {
+            console.log("SIGN IN ERROR: ", e);
+            notifications.update({
+                id: "login",
+                title: "Error logging in",
+                message: "Please try again",
+                autoClose: true,
+                color: "red",
+            })
+        }
     };
-    return <button onClick={() => login()}>Login</button>;
+    return <button className={classes.loginBtn} onClick={() => login()}>Login</button>;
 }
