@@ -196,16 +196,11 @@ export default async function handler(
         }
 
         if (req.body.collection === "User") {
-            const { name, description, image } = req.body;
-            if (!name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
-                return;
-            }
             // Create a record
             const response = await db.collection("User").create([id as string]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "Posts") {
-            const { userAddress, body, media, mediaType } = req.body;
+            const { userAddress, body } = req.body;
             if (!userAddress || !body) {
                 res.status(400).json({ response: "Missing required fields" });
                 return;
