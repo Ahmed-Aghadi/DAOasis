@@ -1,13 +1,9 @@
 import "@/styles/globals.css";
 import type {AppProps} from "next/app";
 import {MantineProvider, MantineThemeOverride} from '@mantine/core';
-import {useContext, useEffect, useState} from "react";
-import {SafeEventEmitterProvider} from "@web3auth/base";
-import {
-    SafeAuthKit,
-    SafeAuthProviderType,
-    SafeAuthSignInData,
-} from "@safe-global/auth-kit";
+import {Notifications} from "@mantine/notifications";
+import {useContext} from "react";
+import {motion} from 'framer-motion';
 import SafeAuthContext, {
     SafeAuthContextProvider,
 } from "@/contexts/SafeAuthContext";
@@ -33,7 +29,15 @@ export default function App({Component, pageProps}: AppProps) {
     return (
         <SafeAuthContextProvider>
             <MantineProvider theme={myTheme}>
-                <Component {...pageProps} />
+                <Notifications />
+                <motion.div
+                    key={675}
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                    exit={{opacity: 0}}
+                >
+                    <Component {...pageProps} />
+                </motion.div>
             </MantineProvider>
         </SafeAuthContextProvider>
     );

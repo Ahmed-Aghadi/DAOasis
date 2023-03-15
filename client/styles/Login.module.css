@@ -1,0 +1,20 @@
+.bg {
+    background-color: #e1dbf5;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.holder {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 45rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

@@ -6,13 +6,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <AppShell
             // navbar={<Navbar />}
-            //  header={<Header />}
             header={<HeaderTabsColored />}
-            // styles={(theme) => ({
-            //     main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
-            //   })}
-            //   padding="md"
-            // @ts-ignore
             padding="xs"
         >
             {children}

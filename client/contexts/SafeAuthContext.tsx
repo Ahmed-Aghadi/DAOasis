@@ -5,6 +5,7 @@ import {
 } from "@safe-global/auth-kit";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import React, { useEffect, useState } from "react";
+import {getRpc} from "@/lib/getRpc";
 
 const SafeAuthContext = React.createContext({
     safeAuth: undefined as SafeAuthKit | undefined,
@@ -12,6 +13,7 @@ const SafeAuthContext = React.createContext({
     provider: null as SafeEventEmitterProvider | null,
     setProvider: (provider: SafeEventEmitterProvider | null) => {},
     safeAuthSignInResponse: null as SafeAuthSignInData | null,
+    setChainId: (chainId: string) => {},
     setSafeAuthSignInResponse: (
         safeAuthSignInResponse: SafeAuthSignInData | null
     ) => {},
@@ -24,25 +26,28 @@ export const SafeAuthContextProvider = (props: any) => {
     );
     const [safeAuthSignInResponse, setSafeAuthSignInResponse] =
         useState<SafeAuthSignInData | null>(null);
+    const [chainId, setChainId] = useState("0x13881");
 
     useEffect(() => {
         (async () => {
+            console.log("CHAIN ID", chainId)
+            const rpc = getRpc(chainId);
             console.log("INITIALIZING SAFE AUTH KIT");
             const data = await SafeAuthKit.init(SafeAuthProviderType.Web3Auth, {
-                chainId: "0x13881",
+                chainId: chainId,
                 txServiceUrl: "https://safe-transaction-goerli.safe.global", // Optional. Only if want to retrieve related safes
                 authProviderConfig: {
-                    rpcTarget: `https://polygon-mumbai.g.alchemy.com/v2/FhukjFEzDF-wIU2JxA11kGHQhevBg3AB`,
+                    rpcTarget: rpc,
                     clientId:
                         "BPw_nSO-LJembIhBHn-ga0hDG0LBSC0TBIuY7jNXdcKrp_QnKkx35bjcxSFLo5U-DkdkoRn08QNnGx9zY94m9Gg",
                     network: "testnet",
-                    theme: "dark",
+                    theme: "light",
                 },
             });
             console.log("INITIALIZED SAFE AUTH KIT", data);
             setSafeAuth(data);
         })();
-    }, []);
+    }, [chainId]);
     return (
         <SafeAuthContext.Provider
             value={{
@@ -55,6 +60,7 @@ export const SafeAuthContextProvider = (props: any) => {
                 setProvider,
                 safeAuthSignInResponse,
                 setSafeAuthSignInResponse,
+                setChainId
             }}
         >
             {props.children}

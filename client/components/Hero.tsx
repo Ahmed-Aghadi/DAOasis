@@ -1,7 +1,8 @@
 import {createStyles, Container, Text, Button, Group, rem} from '@mantine/core';
-import {GithubIcon} from '@mantine/ds';
+import {motion} from 'framer-motion';
 import bgImage from "../public/logo-wo-bg.png"
 import Image from "next/image";
+import {notifications} from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
     hero: {
@@ -31,13 +32,25 @@ const useStyles = createStyles((theme) => ({
 export function HeroTitle() {
     const {classes} = useStyles();
 
+    const notif = () => {
+        notifications.show({
+            title: "Source Code",
+            message: "This is the source code for the app",
+            autoClose: true,
+        })
+    }
+
     return (
         <div className={classes.hero}>
             <div className={classes.image}>
                 <Image src={bgImage} alt={"logo"} width={1100} height={750}/>
                 <div className={classes.btn}>
-                    <Button mx={"md"} size={"xl"} className={classes.btns}>Source Code</Button>
-                    <Button mx={"md"} size={"xl"} className={classes.btns}>Launch App</Button>
+                    <Button onClick={notif} mx={"md"} size={"xl"} className={classes.btns}>Source Code</Button>
+                    <Button component={"a"} href={"/login"} mx={"md"} size={"xl"} className={classes.btns}>
+                        <motion.div whileHover={{scale: 1.0}} whileTap={{scale: 0.9}}>
+                            Launch App
+                        </motion.div>
+                    </Button>
                 </div>
             </div>
         </div>
