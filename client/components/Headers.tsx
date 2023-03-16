@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import {
     createStyles,
     Header,
@@ -7,12 +7,13 @@ import {
     Burger,
     Paper,
     Transition,
-    rem,
+    rem, Text, Button,
 } from '@mantine/core';
 import {useDisclosure} from '@mantine/hooks';
 import logo from "@/public/logo-wo-bg.png"
 import Link from "next/link";
 import Image from "next/image";
+import SafeAuthContext from '@/contexts/SafeAuthContext';
 
 const HEADER_HEIGHT = rem(95);
 
@@ -110,6 +111,7 @@ export function HeaderResponsive() {
     const [opened, {toggle, close}] = useDisclosure(false);
     const [active, setActive] = useState(links[0].link);
     const {classes, cx} = useStyles();
+    const ctx = useContext(SafeAuthContext)
 
     const items = links.map((link) => (
         <Link
@@ -132,6 +134,17 @@ export function HeaderResponsive() {
                 <Image src={logo} alt={"logo"} width={300} />
                 <Group spacing={5} className={classes.links}>
                     {items}
+                </Group>
+                <Group spacing={5}>
+                    <Text color="white" size="sm">
+                        {`${ctx.safeAuthSignInResponse?.eoa.slice(0, 6)}...${ctx.safeAuthSignInResponse?.eoa.slice(-4)}` || "Not logged in"}
+                    </Text>
+                    <Button onClick={() => {
+                        sessionStorage.clear()
+                        ctx.safeAuth?.signOut()
+                    }}>
+                        Logout
+                    </Button>
                 </Group>
 
                 <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm"/>
