@@ -59,7 +59,7 @@ const schema = `
     collection MultiSig {
         // multiSig public address
         id: string;
-        owners: string[]
+        owners: string[];
         name?: string; 
         description?: string; 
         image?: string;
@@ -117,7 +117,7 @@ const signInPolybase = () => {
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
 
-    console.log("PRIVATE_KEY", wallet.privateKey);
+    // console.log("PRIVATE_KEY", wallet.privateKey);
 
     // If you want to edit the contract code in the future,
     // you must sign the request when calling applySchema for the first time
@@ -136,7 +136,7 @@ async function handleGet(
     res: NextApiResponse<Data>,
     collection: Collection<any>
 ) {
-    const {id} = req.body;
+    const {id} = req.query;
     if (!id) {
         const recordData = await collection.get();
         res.status(200).json({response: recordData});
@@ -151,19 +151,27 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-    const body = req.body;
-    if (!body) {
-        res.status(400).json({response: "Missing body"});
-        return;
-    }
     const db = signInPolybase();
 
-    // Create a collection
-    const createResponse = await db.applySchema(schema);
-    console.log(createResponse);
+    // // Create a collection
+    // const createResponse = await db.applySchema(schema);
+    // console.log(createResponse);
 
+    const body = req.body;
+    const params = req.query;
     if (req.method === "GET") {
-        const {collection} = req.body;
+        if (!params || Object.keys(params).length === 0) {
+            res.status(400).json({response: "Missing query params"});
+            return;
+        }
+    } else if (req.method === "POST" || req.method === "PATCH") {
+        if (!body || Object.keys(body).length === 0) {
+            res.status(400).json({response: "Missing body"});
+            return;
+        }
+    }
+    if (req.method === "GET") {
+        const {collection} = params;
         if (!collection) {
             res.status(400).json({
                 response: "Missing required field 'collection'",
@@ -189,23 +197,19 @@ export default async function handler(
         }
         return;
     } else if (req.method === "POST") {
-        const {id} = req.body;
+        const {id} = body;
+        console.log(body, body.id, id)
         if (!id) {
             res.status(400).json({response: "Missing required field 'id'"});
             return;
         }
 
         if (req.body.collection === "User") {
-            const {name, description, image} = req.body;
-            if (!name || !description || !image) {
-                res.status(400).json({response: "Missing required fields"});
-                return;
-            }
             // Create a record
             const response = await db.collection("User").create([id as string]);
             res.status(200).json({response: response});
         } else if (req.body.collection === "Posts") {
-            const {userAddress, body, media, mediaType} = req.body;
+            const {userAddress, body} = req.body;
             if (!userAddress || !body) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
@@ -242,14 +246,14 @@ export default async function handler(
             return;
         }
     } else if (req.method === "PATCH") {
-        const {id} = req.body;
+        const {id} = body;
         if (!id) {
             res.status(400).json({response: "Missing required field 'id'"});
             return;
         }
         if (req.body.collection === "User") {
-            const {name, description, image} = req.body;
-            if (!name || !description || !image) {
+            const {name, description, image} = body;
+            if (!body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image")) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
             }
@@ -260,7 +264,7 @@ export default async function handler(
             res.status(200).json({response: recordData});
             return;
         } else if (req.body.collection === "Posts") {
-            const {media, mediaType} = req.body;
+            const {media, mediaType} = body;
             if (!media || !mediaType) {
                 res.status(400).json({response: "Missing required fields"});
                 return;

@@ -3,10 +3,13 @@ import {SafeEventEmitterProvider} from "@web3auth/base";
 import {useContext} from "react";
 import {loginStyles} from "@/styles/login.styles";
 import {notifications} from "@mantine/notifications";
+import {useRouter} from "next/router";
+import { getProfile } from "@/lib/polybase";
 
 
 export default function Login() {
     const ctx = useContext(SafeAuthContext);
+    const router = useRouter();
     const {classes} = loginStyles();
     const login = async () => {
         if (!ctx.safeAuth) return;
@@ -20,6 +23,9 @@ export default function Login() {
         try {
             const response = await ctx.safeAuth.signIn();
             console.log("SIGN IN RESPONSE: ", response);
+            const {eoa} = response as { eoa: `0x${string}` };
+            const profile = await getProfile(eoa);
+            console.log("PROFILE: ", profile)
 
             ctx.setSafeAuthSignInResponse(response);
             ctx.setProvider(ctx.safeAuth.getProvider() as SafeEventEmitterProvider);
@@ -30,6 +36,7 @@ export default function Login() {
                 autoClose: true,
                 color: "green",
             })
+            router.push("/dashboard")
         } catch (e) {
             console.log("SIGN IN ERROR: ", e);
             notifications.update({

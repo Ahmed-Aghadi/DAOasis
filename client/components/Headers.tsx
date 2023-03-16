@@ -1,320 +1,149 @@
-import { useContext, useState } from "react";
+import {useState} from 'react';
 import {
     createStyles,
+    Header,
     Container,
-    Avatar,
-    UnstyledButton,
     Group,
-    Text,
-    Menu,
-    Tabs,
     Burger,
+    Paper,
+    Transition,
     rem,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import {
-    IconLogout,
-    IconHeart,
-    IconStar,
-    IconMessage,
-    IconSettings,
-    IconPlayerPause,
-    IconTrash,
-    IconSwitchHorizontal,
-    IconChevronDown,
-} from "@tabler/icons-react";
-import { headers } from "@/constants";
-import Login from "./Login";
-import SafeAuthContext from "@/contexts/SafeAuthContext";
-import Logout from "./Logout";
-// import { MantineLogo } from "@mantine/ds";
+} from '@mantine/core';
+import {useDisclosure} from '@mantine/hooks';
+import logo from "@/public/logo-wo-bg.png"
+import Link from "next/link";
+import Image from "next/image";
+
+const HEADER_HEIGHT = rem(95);
 
 const useStyles = createStyles((theme) => ({
-    header: {
-        paddingTop: theme.spacing.sm,
-        backgroundColor: theme.fn.variant({
-            variant: "filled",
-            color: theme.primaryColor,
-        }).background,
-        borderBottom: `${rem(1)} solid ${
-            theme.fn.variant({ variant: "filled", color: theme.primaryColor })
-                .background
-        }`,
-        // marginBottom: rem(120),
+    root: {
+        backgroundColor: theme.colors.blueTheme[0],
+        position: 'relative',
+        zIndex: 1,
+        marginBottom: -76
     },
 
-    mainSection: {
-        paddingBottom: theme.spacing.sm,
-    },
+    dropdown: {
+        position: 'absolute',
+        top: HEADER_HEIGHT,
+        left: 0,
+        right: 0,
+        zIndex: 0,
+        borderTopRightRadius: 0,
+        borderTopLeftRadius: 0,
+        borderTopWidth: 0,
+        overflow: 'hidden',
 
-    user: {
-        color: theme.white,
-        padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-        borderRadius: theme.radius.sm,
-        transition: "background-color 100ms ease",
-
-        "&:hover": {
-            backgroundColor: theme.fn.lighten(
-                theme.fn.variant({
-                    variant: "filled",
-                    color: theme.primaryColor,
-                }).background!,
-                0.1
-            ),
+        [theme.fn.largerThan('sm')]: {
+            display: 'none',
         },
+    },
 
-        [theme.fn.smallerThan("xs")]: {
-            display: "none",
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: '100%',
+    },
+
+    links: {
+        [theme.fn.smallerThan('sm')]: {
+            display: 'none',
         },
     },
 
     burger: {
-        [theme.fn.largerThan("xs")]: {
-            display: "none",
+        [theme.fn.largerThan('sm')]: {
+            display: 'none',
         },
     },
 
-    userActive: {
-        backgroundColor: theme.fn.lighten(
-            theme.fn.variant({ variant: "filled", color: theme.primaryColor })
-                .background!,
-            0.1
-        ),
-    },
-
-    tabs: {
-        [theme.fn.smallerThan("sm")]: {
-            display: "none",
-        },
-    },
-
-    tabsList: {
-        borderBottom: "0 !important",
-    },
-
-    tab: {
+    link: {
+        display: 'block',
+        lineHeight: 1,
+        padding: `${rem(8)} ${rem(12)}`,
+        borderRadius: theme.radius.sm,
+        textDecoration: 'none',
+        color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
+        fontSize: theme.fontSizes.sm,
         fontWeight: 500,
-        height: rem(38),
-        color: theme.white,
-        backgroundColor: "transparent",
-        borderColor: theme.fn.variant({
-            variant: "filled",
-            color: theme.primaryColor,
-        }).background,
 
-        "&:hover": {
-            backgroundColor: theme.fn.lighten(
-                theme.fn.variant({
-                    variant: "filled",
-                    color: theme.primaryColor,
-                }).background!,
-                0.1
-            ),
+        '&:hover': {
+            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
         },
 
-        "&[data-active]": {
-            backgroundColor: theme.fn.lighten(
-                theme.fn.variant({
-                    variant: "filled",
-                    color: theme.primaryColor,
-                }).background!,
-                0.1
-            ),
-            borderColor: theme.fn.variant({
-                variant: "filled",
-                color: theme.primaryColor,
-            }).background,
+        [theme.fn.smallerThan('sm')]: {
+            borderRadius: 0,
+            padding: theme.spacing.md,
+        },
+    },
+
+    linkActive: {
+        '&, &:hover': {
+            backgroundColor: theme.fn.variant({variant: 'light', color: theme.primaryColor}).background,
+            color: theme.fn.variant({variant: 'light', color: theme.primaryColor}).color,
         },
     },
 }));
 
-export function HeaderTabsColored() {
-    const { user, tabs } = headers;
-    const ctx = useContext(SafeAuthContext);
-    const { classes, theme, cx } = useStyles();
-    const [opened, { toggle }] = useDisclosure(false);
-    const [userMenuOpened, setUserMenuOpened] = useState(false);
+const links = [
+    {
+        "link": "/about",
+        "label": "Features"
+    },
+    {
+        "link": "/pricing",
+        "label": "Pricing"
+    },
+    {
+        "link": "/learn",
+        "label": "Learn"
+    },
+    {
+        "link": "/community",
+        "label": "Community"
+    }
+]
 
-    const [activeTab, setActiveTab] = useState<string | null>(tabs[0]);
+export function HeaderResponsive() {
+    const [opened, {toggle, close}] = useDisclosure(false);
+    const [active, setActive] = useState(links[0].link);
+    const {classes, cx} = useStyles();
 
-    const items = tabs.map((tab) => (
-        <Tabs.Tab value={tab} key={tab}>
-            {tab}
-        </Tabs.Tab>
+    const items = links.map((link) => (
+        <Link
+            key={link.label}
+            href={link.link}
+            className={cx(classes.link, {[classes.linkActive]: active === link.link})}
+            onClick={(event) => {
+                event.preventDefault();
+                setActive(link.link);
+                close();
+            }}
+        >
+            {link.label}
+        </Link>
     ));
 
     return (
-        <div className={classes.header}>
-            <Container className={classes.mainSection}>
-                <Group position="apart">
-                    {/* <MantineLogo size={28} inverted /> */}
-                    <Text>THE APP</Text>
-
-                    <Burger
-                        opened={opened}
-                        onClick={toggle}
-                        className={classes.burger}
-                        size="sm"
-                        color={theme.white}
-                    />
-
-                    <Group position="center">
-                        <Menu
-                            width={260}
-                            position="bottom-end"
-                            transitionProps={{ transition: "pop-top-right" }}
-                            onClose={() => setUserMenuOpened(false)}
-                            onOpen={() => setUserMenuOpened(true)}
-                            withinPortal
-                        >
-                            <Menu.Target>
-                                <UnstyledButton
-                                    className={cx(classes.user, {
-                                        [classes.userActive]: userMenuOpened,
-                                    })}
-                                >
-                                    <Group spacing={7}>
-                                        <Avatar
-                                            src={user.image}
-                                            alt={user.name}
-                                            radius="xl"
-                                            size={20}
-                                        />
-                                        <Text
-                                            weight={500}
-                                            size="sm"
-                                            sx={{
-                                                lineHeight: 1,
-                                                color: theme.white,
-                                            }}
-                                            mr={3}
-                                        >
-                                            {user.name}
-                                        </Text>
-                                        <IconChevronDown
-                                            size={rem(12)}
-                                            stroke={1.5}
-                                        />
-                                    </Group>
-                                </UnstyledButton>
-                            </Menu.Target>
-                            <Menu.Dropdown>
-                                <Menu.Item
-                                    icon={
-                                        <IconHeart
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                            color={theme.colors.red[6]}
-                                        />
-                                    }
-                                >
-                                    Liked posts
-                                </Menu.Item>
-                                <Menu.Item
-                                    icon={
-                                        <IconStar
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                            color={theme.colors.yellow[6]}
-                                        />
-                                    }
-                                >
-                                    Saved posts
-                                </Menu.Item>
-                                <Menu.Item
-                                    icon={
-                                        <IconMessage
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                            color={theme.colors.blue[6]}
-                                        />
-                                    }
-                                >
-                                    Your comments
-                                </Menu.Item>
-
-                                <Menu.Label>Settings</Menu.Label>
-                                <Menu.Item
-                                    icon={
-                                        <IconSettings
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                        />
-                                    }
-                                >
-                                    Account settings
-                                </Menu.Item>
-                                <Menu.Item
-                                    icon={
-                                        <IconSwitchHorizontal
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                        />
-                                    }
-                                >
-                                    Change account
-                                </Menu.Item>
-                                <Menu.Item
-                                    icon={
-                                        <IconLogout
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                        />
-                                    }
-                                >
-                                    Logout
-                                </Menu.Item>
-
-                                <Menu.Divider />
-
-                                <Menu.Label>Danger zone</Menu.Label>
-                                <Menu.Item
-                                    icon={
-                                        <IconPlayerPause
-                                            size="0.9rem"
-                                            stroke={1.5}
-                                        />
-                                    }
-                                >
-                                    Pause subscription
-                                </Menu.Item>
-                                <Menu.Item
-                                    color="red"
-                                    icon={
-                                        <IconTrash size="0.9rem" stroke={1.5} />
-                                    }
-                                >
-                                    Delete account
-                                </Menu.Item>
-                            </Menu.Dropdown>
-                        </Menu>
-
-                        {!ctx.safeAuthSignInResponse?.eoa ? (
-                            <Login />
-                        ) : (
-                            <>
-                                <Text>{ctx.safeAuthSignInResponse.eoa}</Text>
-                                <Logout />
-                            </>
-                        )}
-                    </Group>
+        <Header height={HEADER_HEIGHT} className={classes.root}>
+            <Container className={classes.header}>
+                <Image src={logo} alt={"logo"} width={300} />
+                <Group spacing={5} className={classes.links}>
+                    {items}
                 </Group>
+
+                <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm"/>
+
+                <Transition transition="pop-top-right" duration={200} mounted={opened}>
+                    {(styles) => (
+                        <Paper className={classes.dropdown} withBorder style={styles}>
+                            {items}
+                        </Paper>
+                    )}
+                </Transition>
             </Container>
-            <Container>
-                <Tabs
-                    // defaultValue="Home"
-                    variant="outline"
-                    classNames={{
-                        root: classes.tabs,
-                        tabsList: classes.tabsList,
-                        tab: classes.tab,
-                    }}
-                    value={activeTab}
-                    onTabChange={setActiveTab}
-                >
-                    <Tabs.List>{items}</Tabs.List>
-                </Tabs>
-            </Container>
-        </div>
+        </Header>
     );
 }

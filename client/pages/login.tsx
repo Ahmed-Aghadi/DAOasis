@@ -16,13 +16,13 @@ export default function LoginPage() {
                     <Text size={35} my={"md"}>
                         Welcome to DAOasis
                     </Text>
-                    <ChainSelect />
+                    <ChainSelect/>
                     <div style={{width: "50%"}}>
                         <Divider my="xs" variant={"solid"} labelPosition="center"/>
                     </div>
                     <RegistrationForm/>
                     <div style={{width: "50%"}}>
-                    <Divider my="xs" label="OR" variant={"solid"} labelPosition="center"/>
+                        <Divider my="xs" label="OR" variant={"solid"} labelPosition="center"/>
                     </div>
                     <Login/>
                 </div>
