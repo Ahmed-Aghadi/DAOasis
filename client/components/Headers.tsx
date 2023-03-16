@@ -16,6 +16,7 @@ import logo from "@/public/logo-wo-bg.png";
 import Link from "next/link";
 import Image from "next/image";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
+import Logout from "@/components/Logout";
 
 const HEADER_HEIGHT = rem(95);
 
@@ -159,14 +160,7 @@ export function HeaderResponsive() {
                         )}...${ctx.safeAuthSignInResponse?.eoa.slice(-4)}` ||
                             "Not logged in"}
                     </Text>
-                    <Button
-                        onClick={() => {
-                            sessionStorage.clear();
-                            ctx.safeAuth?.signOut();
-                        }}
-                    >
-                        Logout
-                    </Button>
+                    <Logout />
                 </Group>
 
                 <Burger

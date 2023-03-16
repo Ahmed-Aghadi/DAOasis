@@ -1,10 +1,10 @@
-import { AppShell, Navbar, Header } from "@mantine/core";
-import { HeaderResponsive } from "./Headers";
-import { useContext, useEffect, useState } from "react";
+import {AppShell, Navbar, Header} from "@mantine/core";
+import {HeaderResponsive} from "./Headers";
+import {useContext, useEffect, useState} from "react";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({children}: { children: React.ReactNode }) {
     const ctx = useContext(SafeAuthContext);
     const router = useRouter();
 
@@ -16,9 +16,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <AppShell
             // navbar={<Navbar />}
-            header={<HeaderResponsive />}
+            header={<HeaderResponsive/>}
         >
-            <button onClick={() => console.log(ctx)}>Dashboard</button>
             {children}
         </AppShell>
     );
