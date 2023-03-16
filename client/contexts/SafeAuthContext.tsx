@@ -21,6 +21,8 @@ const SafeAuthContext = React.createContext({
     setSafeAuthSignInResponse: (
         safeAuthSignInResponse: SafeAuthSignInData | null
     ) => {},
+    // login: async () => {},
+    // logout: async () => {},
 });
 
 export const SafeAuthContextProvider = (props: any) => {
@@ -34,21 +36,19 @@ export const SafeAuthContextProvider = (props: any) => {
     const [chainId, setChainId] = useState("0x13881");
 
     useEffect(() => {
-        const data = JSON.parse(sessionStorage.getItem("safeAuth") || "{}");
-        setSafeAuth(data);
-        const data1 = JSON.parse(
-            sessionStorage.getItem("safeAuthSignInResponse") || "{}"
+        if (
+            !sessionStorage.getItem("safeAuthSignInResponse") ||
+            !sessionStorage.getItem("provider")
+        ) {
+            setLoading(false);
+            return;
+        }
+        setSafeAuthSignInResponse(
+            JSON.parse(sessionStorage.getItem("safeAuthSignInResponse")!)
         );
-        setSafeAuthSignInResponse(data1);
+        setProvider(JSON.parse(sessionStorage.getItem("provider")!));
         setLoading(false);
     }, []);
-
-    useEffect(() => {
-        sessionStorage.setItem(
-            "safeAuthSignInResponse",
-            JSON.stringify(safeAuthSignInResponse)
-        );
-    }, [safeAuthSignInResponse]);
 
     useEffect(() => {
         (async () => {
@@ -67,10 +67,40 @@ export const SafeAuthContextProvider = (props: any) => {
                 },
             });
             console.log("INITIALIZED SAFE AUTH KIT", data);
-            sessionStorage.setItem("safeAuth", JSON.stringify(data));
             setSafeAuth(data);
         })();
     }, [chainId]);
+
+    // const login = async () => {
+    //     if (!safeAuth) return;
+
+    //     const response = await safeAuth.signIn();
+    //     console.log("SIGN IN RESPONSE: ", response);
+
+    //     setSafeAuthSignInResponse(response);
+    //     setProvider(safeAuth.getProvider() as SafeEventEmitterProvider);
+
+    //     sessionStorage.setItem(
+    //         "safeAuthSignInResponse",
+    //         JSON.stringify(response)
+    //     );
+    //     sessionStorage.setItem(
+    //         "provider",
+    //         JSON.stringify(safeAuth.getProvider())
+    //     );
+    // };
+
+    // const logout = async () => {
+    //     if (!safeAuth) return;
+
+    //     await safeAuth.signOut();
+
+    //     setProvider(null);
+    //     setSafeAuthSignInResponse(null);
+    //     sessionStorage.removeItem("safeAuthSignInResponse");
+    //     sessionStorage.removeItem("provider");
+    // };
+
     return (
         <SafeAuthContext.Provider
             value={{
@@ -86,6 +116,8 @@ export const SafeAuthContextProvider = (props: any) => {
                 safeAuthSignInResponse,
                 setSafeAuthSignInResponse,
                 setChainId,
+                // login,
+                // logout,
             }}
         >
             {props.children}

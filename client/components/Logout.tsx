@@ -8,9 +8,9 @@ export default function Logout() {
 
     const logout = async () => {
         if (!ctx.safeAuth) return;
-
         await ctx.safeAuth.signOut();
-
+        sessionStorage.removeItem("safeAuthSignInResponse");
+        sessionStorage.removeItem("provider");
         ctx.setProvider(null);
         ctx.setSafeAuthSignInResponse(null);
     };
