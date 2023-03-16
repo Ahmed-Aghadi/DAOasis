@@ -22,7 +22,7 @@ export default function Dashboard() {
             </Head>
             <h1>Dashboard</h1>
             <Group position="center">
-                <Button onClick={open}>Open modal</Button>
+                <Button onClick={open}>Create Safe </Button>
             </Group>
             {modal}
         </Layout>
