@@ -6,14 +6,19 @@ import { Layout } from "@/components/Layout";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import { useContext } from "react";
 import { HeroTitle } from "@/components/Hero";
+import axios from "axios";
 
 export default function Home() {
     const ctx = useContext(SafeAuthContext);
 
     const getAllRecords = async () => {
-        const res = await fetch("/api/polybase");
-        const data = await res.json();
-        console.log("DATA", data);
+        // const res = await fetch("/api/polybase");
+        const res = await axios.get("/api/polybase", {
+            params: {
+                collection: "User",
+            },
+        });
+        console.log("DATA", res);
     };
 
     const getRecords = async () => {

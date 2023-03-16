@@ -158,12 +158,20 @@ export default async function handler(
     // console.log(createResponse);
 
     const body = req.body;
-    if (!body) {
-        res.status(400).json({ response: "Missing body" });
-        return;
+    const params = req.query;
+    if (req.method === "GET") {
+        if (!params || Object.keys(params).length === 0) {
+            res.status(400).json({ response: "Missing query params" });
+            return;
+        }
+    } else if (req.method === "POST" || req.method === "PATCH") {
+        if (!body || Object.keys(body).length === 0) {
+            res.status(400).json({ response: "Missing body" });
+            return;
+        }
     }
     if (req.method === "GET") {
-        const { collection } = req.body;
+        const { collection } = params;
         if (!collection) {
             res.status(400).json({
                 response: "Missing required field 'collection'",
@@ -186,10 +194,10 @@ export default async function handler(
             handleGet(req, res, multiSigProposalsCollection);
         } else {
             res.status(400).json({ response: "Invalid collection" });
-            return;
         }
+        return;
     } else if (req.method === "POST") {
-        const { id } = req.body;
+        const { id } = body;
         if (!id) {
             res.status(400).json({ response: "Missing required field 'id'" });
             return;
@@ -237,7 +245,7 @@ export default async function handler(
             return;
         }
     } else if (req.method === "PATCH") {
-        const { id } = req.body;
+        const { id } = body;
         if (!id) {
             res.status(400).json({ response: "Missing required field 'id'" });
             return;
