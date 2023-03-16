@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from "next";
+import type {NextApiRequest, NextApiResponse} from "next";
 import {
     Collection,
     CollectionList,
     CollectionRecordResponse,
     Polybase,
 } from "@polybase/client";
-import { ethPersonalSign } from "@polybase/eth";
-import { ethers } from "ethers";
+import {ethPersonalSign} from "@polybase/eth";
+import {ethers} from "ethers";
 
 type Data = {
     response: CollectionList<any> | CollectionRecordResponse<any> | string;
@@ -136,15 +136,15 @@ async function handleGet(
     res: NextApiResponse<Data>,
     collection: Collection<any>
 ) {
-    const { id } = req.body;
+    const {id} = req.body;
     if (!id) {
         const recordData = await collection.get();
-        res.status(200).json({ response: recordData });
+        res.status(200).json({response: recordData});
         return;
     }
     // Get a record
     const recordData = await collection.record(id as string).get();
-    res.status(200).json({ response: recordData });
+    res.status(200).json({response: recordData});
 }
 
 export default async function handler(
@@ -153,7 +153,7 @@ export default async function handler(
 ) {
     const body = req.body;
     if (!body) {
-        res.status(400).json({ response: "Missing body" });
+        res.status(400).json({response: "Missing body"});
         return;
     }
     const db = signInPolybase();
@@ -163,7 +163,7 @@ export default async function handler(
     console.log(createResponse);
 
     if (req.method === "GET") {
-        const { collection } = req.body;
+        const {collection} = req.body;
         if (!collection) {
             res.status(400).json({
                 response: "Missing required field 'collection'",
@@ -185,122 +185,122 @@ export default async function handler(
             );
             handleGet(req, res, multiSigProposalsCollection);
         } else {
-            res.status(400).json({ response: "Invalid collection" });
-            return;
+            res.status(400).json({response: "Invalid collection"});
         }
+        return;
     } else if (req.method === "POST") {
-        const { id } = req.body;
+        const {id} = req.body;
         if (!id) {
-            res.status(400).json({ response: "Missing required field 'id'" });
+            res.status(400).json({response: "Missing required field 'id'"});
             return;
         }
 
         if (req.body.collection === "User") {
-            const { name, description, image } = req.body;
+            const {name, description, image} = req.body;
             if (!name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             // Create a record
             const response = await db.collection("User").create([id as string]);
-            res.status(200).json({ response: response });
+            res.status(200).json({response: response});
         } else if (req.body.collection === "Posts") {
-            const { userAddress, body, media, mediaType } = req.body;
+            const {userAddress, body, media, mediaType} = req.body;
             if (!userAddress || !body) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             // Create a record
             const response = await db
                 .collection("Posts")
                 .create([id as string, userAddress, body]);
-            res.status(200).json({ response: response });
+            res.status(200).json({response: response});
         } else if (req.body.collection === "MultiSig") {
-            const { owners, name, description, image } = req.body;
+            const {owners, name, description, image} = req.body;
             if (!owners || !name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             // Create a record
             const response = await db
                 .collection("MultiSig")
                 .create([id as string, owners, name, description, image]);
-            res.status(200).json({ response: response });
+            res.status(200).json({response: response});
         } else if (req.body.collection === "MultiSigProposals") {
-            const { proposalHash, name, description, image } = req.body;
+            const {proposalHash, name, description, image} = req.body;
             if (!proposalHash || !name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             // Create a record
             const response = await db
                 .collection("MultiSigProposals")
                 .create([id as string, proposalHash, name, description, image]);
-            res.status(200).json({ response: response });
+            res.status(200).json({response: response});
         } else {
-            res.status(400).json({ response: "Invalid collection" });
+            res.status(400).json({response: "Invalid collection"});
             return;
         }
     } else if (req.method === "PATCH") {
-        const { id } = req.body;
+        const {id} = req.body;
         if (!id) {
-            res.status(400).json({ response: "Missing required field 'id'" });
+            res.status(400).json({response: "Missing required field 'id'"});
             return;
         }
         if (req.body.collection === "User") {
-            const { name, description, image } = req.body;
+            const {name, description, image} = req.body;
             if (!name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("User")
                 .record(id as string)
                 .call("updateRecord", [name, description, image]);
-            res.status(200).json({ response: recordData });
+            res.status(200).json({response: recordData});
             return;
         } else if (req.body.collection === "Posts") {
-            const { media, mediaType } = req.body;
+            const {media, mediaType} = req.body;
             if (!media || !mediaType) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("Posts")
                 .record(id as string)
                 .call("updateRecord", [media, mediaType]);
-            res.status(200).json({ response: recordData });
+            res.status(200).json({response: recordData});
             return;
         } else if (req.body.collection === "MultiSig") {
-            const { name, description, image } = req.body;
+            const {name, description, image} = req.body;
             if (!name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("MultiSig")
                 .record(id as string)
                 .call("updateRecord", [name, description, image]);
-            res.status(200).json({ response: recordData });
+            res.status(200).json({response: recordData});
             return;
         } else if (req.body.collection === "MultiSigProposals") {
-            const { name, description, image } = req.body;
+            const {name, description, image} = req.body;
             if (!name || !description || !image) {
-                res.status(400).json({ response: "Missing required fields" });
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("MultiSigProposals")
                 .record(id as string)
                 .call("updateRecord", [name, description, image]);
-            res.status(200).json({ response: recordData });
+            res.status(200).json({response: recordData});
             return;
         } else {
-            res.status(400).json({ response: "Invalid collection" });
+            res.status(400).json({response: "Invalid collection"});
             return;
         }
     }
 
     // invalid method
-    res.status(400).json({ response: "Invalid method" });
+    res.status(400).json({response: "Invalid method"});
 }
