@@ -1,32 +1,30 @@
-"use client"
+"use client";
 
 import {
     SafeAuthKit,
     SafeAuthProviderType,
     SafeAuthSignInData,
 } from "@safe-global/auth-kit";
-import {SafeEventEmitterProvider} from "@web3auth/base";
-import React, {useEffect, useState} from "react";
-import {getRpc} from "@/lib/getRpc";
+import { SafeEventEmitterProvider } from "@web3auth/base";
+import React, { useEffect, useState } from "react";
+import { getRpc } from "@/lib/getRpc";
 
 const SafeAuthContext = React.createContext({
+    loading: true,
+    setLoading: (loading: boolean) => {},
     safeAuth: undefined as SafeAuthKit | undefined,
-    setSafeAuth: (safeAuth: SafeAuthKit | undefined) => {
-    },
+    setSafeAuth: (safeAuth: SafeAuthKit | undefined) => {},
     provider: null as SafeEventEmitterProvider | null,
-    setProvider: (provider: SafeEventEmitterProvider | null) => {
-    },
+    setProvider: (provider: SafeEventEmitterProvider | null) => {},
     safeAuthSignInResponse: null as SafeAuthSignInData | null,
-    setChainId: (chainId: string) => {
-    },
+    setChainId: (chainId: string) => {},
     setSafeAuthSignInResponse: (
         safeAuthSignInResponse: SafeAuthSignInData | null
-    ) => {
-    },
+    ) => {},
 });
 
 export const SafeAuthContextProvider = (props: any) => {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [safeAuth, setSafeAuth] = useState<SafeAuthKit>();
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
         null
@@ -37,18 +35,24 @@ export const SafeAuthContextProvider = (props: any) => {
 
     useEffect(() => {
         const data = JSON.parse(sessionStorage.getItem("safeAuth") || "{}");
-        setSafeAuth(data)
-        const data1 = JSON.parse(sessionStorage.getItem("safeAuthSignInResponse") || "{}");
-        setSafeAuthSignInResponse(data1)
-    }, [])
+        setSafeAuth(data);
+        const data1 = JSON.parse(
+            sessionStorage.getItem("safeAuthSignInResponse") || "{}"
+        );
+        setSafeAuthSignInResponse(data1);
+        setLoading(false);
+    }, []);
 
     useEffect(() => {
-        sessionStorage.setItem("safeAuthSignInResponse", JSON.stringify(safeAuthSignInResponse));
-    },[safeAuthSignInResponse])
+        sessionStorage.setItem(
+            "safeAuthSignInResponse",
+            JSON.stringify(safeAuthSignInResponse)
+        );
+    }, [safeAuthSignInResponse]);
 
     useEffect(() => {
         (async () => {
-            console.log("CHAIN ID", chainId)
+            console.log("CHAIN ID", chainId);
             const rpc = getRpc(chainId);
             console.log("INITIALIZING SAFE AUTH KIT");
             const data = await SafeAuthKit.init(SafeAuthProviderType.Web3Auth, {
@@ -70,6 +74,8 @@ export const SafeAuthContextProvider = (props: any) => {
     return (
         <SafeAuthContext.Provider
             value={{
+                loading,
+                setLoading,
                 safeAuth,
                 setSafeAuth: (data) => {
                     console.log("SETTING SAFE AUTH", data);
@@ -79,7 +85,7 @@ export const SafeAuthContextProvider = (props: any) => {
                 setProvider,
                 safeAuthSignInResponse,
                 setSafeAuthSignInResponse,
-                setChainId
+                setChainId,
             }}
         >
             {props.children}
