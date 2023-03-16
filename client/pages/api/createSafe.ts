@@ -2,9 +2,9 @@ import { SafeAccountConfig, SafeDeploymentConfig, SafeFactory } from '@safe-glob
 import EthersAdapter from '@safe-global/safe-ethers-lib'
 import { ethers } from 'ethers'
 import {NextApiRequest, NextApiResponse} from "next";
+import {getRpc} from "@/lib/getRpc";
 
 interface Config {
-    RPC_URL: string
     DEPLOYER_ADDRESS_PRIVATE_KEY: string
     DEPLOY_SAFE: {
         SALT_NONCE: string
@@ -12,7 +12,6 @@ interface Config {
 }
 
 const config: Config = {
-    RPC_URL: process.env.RPC_URL as string,
     DEPLOYER_ADDRESS_PRIVATE_KEY: process.env.PRIVATE_KEY as string,
     DEPLOY_SAFE: {
         SALT_NONCE: '1'
@@ -20,8 +19,9 @@ const config: Config = {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const {owners, threshold} = req.body as {owners: string[], threshold: number}
-    const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
+    const {owners, threshold, chainId} = req.body as {owners: string[], threshold: number, chainId: string}
+    const rpc = getRpc(chainId)
+    const provider = new ethers.providers.JsonRpcProvider(rpc)
     const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
 
     console.log("Owners:", owners)
@@ -63,5 +63,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Predicted deployed address:', predictedDeployAddress)
     console.log('Deployed Safe:', safe.getAddress())
 
-    res.status(200).json({address: safe.getAddress()})
+    res.status(200).json({safeAddress: safe.getAddress()})
 }
