@@ -59,7 +59,7 @@ const schema = `
     collection MultiSig {
         // multiSig public address
         id: string;
-        owners: string[]
+        owners: string[];
         name?: string; 
         description?: string; 
         image?: string;
@@ -117,7 +117,7 @@ const signInPolybase = () => {
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
 
-    console.log("PRIVATE_KEY", wallet.privateKey);
+    // console.log("PRIVATE_KEY", wallet.privateKey);
 
     // If you want to edit the contract code in the future,
     // you must sign the request when calling applySchema for the first time
@@ -151,17 +151,17 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
+    const db = signInPolybase();
+
+    // // Create a collection
+    // const createResponse = await db.applySchema(schema);
+    // console.log(createResponse);
+
     const body = req.body;
     if (!body) {
         res.status(400).json({ response: "Missing body" });
         return;
     }
-    const db = signInPolybase();
-
-    // Create a collection
-    const createResponse = await db.applySchema(schema);
-    console.log(createResponse);
-
     if (req.method === "GET") {
         const { collection } = req.body;
         if (!collection) {
