@@ -12,8 +12,8 @@ export const getRpc = (chainId: string) => {
             return 'https://rpc.eu-central-2.gateway.fm/v3/gnosis/archival/chiado'
         case '0xa':
             return 'https://mainnet.optimism.io'
-        case '0x1a4':
-            return 'https://endpoints.omniatech.io/v1/op/goerli/public'
+        case '0x1A4':
+            return 'https://goerli.optimism.io'
         default:
             return 'https://rpc.ankr.com/polygon_mumbai'
     }

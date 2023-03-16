@@ -1,5 +1,3 @@
-"use client";
-
 import {
     SafeAuthKit,
     SafeAuthProviderType,
@@ -8,6 +6,7 @@ import {
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import React, { useEffect, useState } from "react";
 import { getRpc } from "@/lib/getRpc";
+import {getProfile} from "@/lib/polybase";
 
 const SafeAuthContext = React.createContext({
     loading: true,
@@ -21,8 +20,6 @@ const SafeAuthContext = React.createContext({
     setSafeAuthSignInResponse: (
         safeAuthSignInResponse: SafeAuthSignInData | null
     ) => {},
-    // login: async () => {},
-    // logout: async () => {},
 });
 
 export const SafeAuthContextProvider = (props: any) => {
@@ -36,21 +33,18 @@ export const SafeAuthContextProvider = (props: any) => {
     const [chainId, setChainId] = useState("0x13881");
 
     useEffect(() => {
-        if (
-            !sessionStorage.getItem("safeAuthSignInResponse") ||
-            !sessionStorage.getItem("provider")
-        ) {
+        if (!sessionStorage.getItem("safeAuthSignInResponse")) {
             setLoading(false);
             return;
         }
-        setSafeAuthSignInResponse(
-            JSON.parse(sessionStorage.getItem("safeAuthSignInResponse")!)
-        );
-        setProvider(JSON.parse(sessionStorage.getItem("provider")!));
+        const data = JSON.parse(sessionStorage.getItem("safeAuthSignInResponse")!)
+        setChainId(data.chainId);
+        setSafeAuthSignInResponse(data);
         setLoading(false);
     }, []);
 
     useEffect(() => {
+        if(loading) return;
         (async () => {
             console.log("CHAIN ID", chainId);
             const rpc = getRpc(chainId);
@@ -67,39 +61,27 @@ export const SafeAuthContextProvider = (props: any) => {
                 },
             });
             console.log("INITIALIZED SAFE AUTH KIT", data);
+            if(safeAuthSignInResponse?.eoa){
+                console.log(safeAuthSignInResponse, "ahmed ki shanti ke liye")
+                const response = await data!.signIn()
+                sessionStorage.setItem(
+                    "safeAuthSignInResponse",
+                    JSON.stringify(response)
+                );
+                console.log("SIGN IN RESPONSE: ", response);
+                const { eoa } = response as { eoa: `0x${string}` };
+                const profile = await getProfile(eoa);
+                console.log("PROFILE: ", profile);
+
+                setSafeAuthSignInResponse(response);
+                setProvider(
+                    data!.getProvider() as SafeEventEmitterProvider
+                );
+            }
             setSafeAuth(data);
         })();
-    }, [chainId]);
+    }, [chainId,loading]);
 
-    // const login = async () => {
-    //     if (!safeAuth) return;
-
-    //     const response = await safeAuth.signIn();
-    //     console.log("SIGN IN RESPONSE: ", response);
-
-    //     setSafeAuthSignInResponse(response);
-    //     setProvider(safeAuth.getProvider() as SafeEventEmitterProvider);
-
-    //     sessionStorage.setItem(
-    //         "safeAuthSignInResponse",
-    //         JSON.stringify(response)
-    //     );
-    //     sessionStorage.setItem(
-    //         "provider",
-    //         JSON.stringify(safeAuth.getProvider())
-    //     );
-    // };
-
-    // const logout = async () => {
-    //     if (!safeAuth) return;
-
-    //     await safeAuth.signOut();
-
-    //     setProvider(null);
-    //     setSafeAuthSignInResponse(null);
-    //     sessionStorage.removeItem("safeAuthSignInResponse");
-    //     sessionStorage.removeItem("provider");
-    // };
 
     return (
         <SafeAuthContext.Provider

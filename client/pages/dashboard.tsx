@@ -1,11 +1,13 @@
 import {Layout} from "@/components/Layout";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import Head from "next/head";
 import {Button, Group, Modal} from "@mantine/core";
 import CreateSafeForm from "@/components/CreateSafeForm";
+import SafeAuthContext from "@/contexts/SafeAuthContext";
 
 export default function Dashboard() {
     const [modalOpened, setModalOpened] = useState(false)
+    const ctx = useContext(SafeAuthContext);
 
     const open = () => {
         setModalOpened(true)

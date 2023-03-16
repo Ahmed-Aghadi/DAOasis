@@ -19,7 +19,7 @@ export default function ChainSelect() {
                     {label: "Polygon", value: "0x89"},
                     {label: "Polygon (Mumbai)", value: "0x13881"},
                     {label: "Optimism", value: "0xa"},
-                    {label: "Optimism (Goerli)", value: "0x1a4"}
+                    {label: "Optimism (Goerli)", value: "0x1A4"}
                 ]}
                 onChange={(value) => {
                     console.log(value);

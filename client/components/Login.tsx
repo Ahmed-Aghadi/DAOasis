@@ -25,10 +25,10 @@ export default function Login() {
                 "safeAuthSignInResponse",
                 JSON.stringify(response)
             );
-            sessionStorage.setItem(
-                "provider",
-                JSON.stringify(ctx.safeAuth.getProvider())
-            );
+            // sessionStorage.setItem(
+            //     "provider",
+            //     JSON.stringify(ctx.safeAuth.getProvider())
+            // );
             console.log("SIGN IN RESPONSE: ", response);
             const { eoa } = response as { eoa: `0x${string}` };
             const profile = await getProfile(eoa);
