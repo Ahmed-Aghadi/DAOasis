@@ -20,7 +20,7 @@ const config: Config = {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const {owners} = req.body as {owners: string[]}
+    const {owners, threshold} = req.body as {owners: string[], threshold: number}
     const provider = new ethers.providers.JsonRpcProvider(config.RPC_URL)
     const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
 
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Config of the deployed Safe
     const safeAccountConfig: SafeAccountConfig = {
         owners: owners,
-        threshold: owners.length
+        threshold: threshold
     }
     const safeDeploymentConfig: SafeDeploymentConfig = {
         saltNonce: config.DEPLOY_SAFE.SALT_NONCE

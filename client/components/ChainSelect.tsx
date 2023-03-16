@@ -11,7 +11,7 @@ export default function ChainSelect() {
                 size={"md"}
                 label="Select chain"
                 mb={"sm"}
-                placeholder="Select chain"
+                placeholder="Defaults to Polygon Mumbai"
                 data={[
                     {label: "Gnosis", value: "0x64"},
                     {label: "Chiado (Gnosis)", value: "0x27d8"},
