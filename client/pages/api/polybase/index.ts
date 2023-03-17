@@ -61,13 +61,15 @@ const schema = `
         threshold: number;
         name: string; 
         description: string;
+        chainId: string;
 
-        constructor (id: string, owners: string[], name: string, description: string, threshold: number) {
+        constructor (id: string, owners: string[], name: string, description: string, threshold: number, chainId: string) {
             this.id = id;
             this.owners = owners;
             this.threshold = threshold;
             this.name = name;
             this.description = description;
+            this.chainId = chainId;
         }
 
         function updateRecord (name: string, description: string) {
@@ -113,7 +115,7 @@ const schema = `
 
 const signInPolybase = () => {
     const db = new Polybase({
-        defaultNamespace: "polybase-test-1234",
+        defaultNamespace: "polybase-test-v0.0",
     });
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
@@ -223,12 +225,13 @@ export default async function handler(
                 .create([id as string, userAddress, description]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "MultiSig") {
-            const { owners, name, description, threshold } = req.body;
+            const { owners, name, description, threshold, chainId } = req.body;
             if (
                 !body.hasOwnProperty("owners") ||
                 !body.hasOwnProperty("name") ||
                 !body.hasOwnProperty("description") ||
-                !body.hasOwnProperty("threshold")
+                !body.hasOwnProperty("threshold") ||
+                !body.hasOwnProperty("chainId")
             ) {
                 res.status(400).json({ response: "Missing required fields" });
                 return;
@@ -236,7 +239,14 @@ export default async function handler(
             // Create a record
             const response = await db
                 .collection("MultiSig")
-                .create([id as string, owners, name, description, threshold]);
+                .create([
+                    id as string,
+                    owners,
+                    name,
+                    description,
+                    threshold,
+                    chainId,
+                ]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "MultiSigProposals") {
             const { proposalHash, name, description, image } = req.body;

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { getAllSafe, getProfile } from "@/lib/polybase";
+import React, { useContext, useEffect, useState } from "react";
+import SafeAuthContext from "./SafeAuthContext";
 
 export type User = {
     id: string;
@@ -31,11 +33,53 @@ const PolybaseContext = React.createContext({
         },
     ],
     setMultiSigs: (multiSigs: MultiSig[]) => {},
+    isProfileExists: false,
+    setIsProfileExists: (isProfileExists: boolean) => {},
+    loading: true,
+    setLoading: (loading: boolean) => {},
 });
 
 export const PolybaseContextProvider = (props: any) => {
     const [user, setUser] = useState<User>();
     const [multiSigs, setMultiSigs] = useState<MultiSig[]>([]);
+    const safeContext = useContext(SafeAuthContext);
+    const [loading, setLoading] = useState(true);
+    const [isProfileExists, setIsProfileExists] = useState(false);
+
+    useEffect(() => {
+        if (!safeContext.safeAuthSignInResponse?.eoa) return;
+        const { eoa } = safeContext.safeAuthSignInResponse as {
+            eoa: `0x${string}`;
+        };
+        (async () => {
+            setLoading(true);
+            try {
+                const profile = await getProfile(eoa);
+                // console.log("PROFILE: ", profile);
+                setUser(profile.response.data as User);
+                const allSafe = await getAllSafe();
+                // console.log("ALL SAFE: ", allSafe);
+                const userSafes = allSafe.response.data.filter(
+                    (safe: { data: MultiSig }) => {
+                        return safe.data.owners.includes(eoa); // NOTE: Might need to check for lowercase and uppercase in the future
+                    }
+                );
+                const userSafesData = userSafes.map(
+                    (safe: { data: MultiSig }) => safe.data
+                );
+                setMultiSigs(userSafesData);
+                // console.log("USER SAFES: ", userSafesData);
+                setIsProfileExists(true);
+            } catch (error) {
+                console.log("ERROR: ", error);
+                setIsProfileExists(false);
+            }
+            setLoading(false);
+        })();
+    }, [
+        safeContext.safeAuthSignInResponse,
+        safeContext.safeAuthSignInResponse?.eoa,
+    ]);
 
     return (
         <PolybaseContext.Provider
@@ -44,6 +88,10 @@ export const PolybaseContextProvider = (props: any) => {
                 setUser,
                 multiSigs,
                 setMultiSigs,
+                isProfileExists,
+                setIsProfileExists,
+                loading,
+                setLoading,
             }}
         >
             {props.children}

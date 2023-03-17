@@ -30,7 +30,7 @@ export const SafeAuthContextProvider = (props: any) => {
     );
     const [safeAuthSignInResponse, setSafeAuthSignInResponse] =
         useState<SafeAuthSignInData | null>(null);
-    const [chainId, setChainId] = useState("0x13881");
+    const [chainId, setChainId] = useState("0x5");
 
     useEffect(() => {
         if (!sessionStorage.getItem("safeAuthSignInResponse")) {

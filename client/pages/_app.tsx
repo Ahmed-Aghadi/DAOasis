@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <SafeAuthContextProvider>
             <PolybaseContextProvider>
                 <MantineProvider theme={myTheme}>
-                    <Notifications />
+                    <Notifications position="top-right" />
                     <motion.div
                         key={675}
                         initial={{ opacity: 0 }}

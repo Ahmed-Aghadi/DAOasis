@@ -1,17 +1,53 @@
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import { SafeEventEmitterProvider } from "@web3auth/base";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { loginStyles } from "@/styles/login.styles";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
-import { getProfile } from "@/lib/polybase";
-import PolybaseContext, { User } from "@/contexts/PolybaseContext";
+import { getAllSafe, getProfile } from "@/lib/polybase";
+import PolybaseContext, { MultiSig, User } from "@/contexts/PolybaseContext";
 
 export default function Login() {
     const safeContext = useContext(SafeAuthContext);
     const polybaseContext = useContext(PolybaseContext);
     const router = useRouter();
     const { classes } = loginStyles();
+    const [loginCalled, setLoginCalled] = useState(false);
+    useEffect(() => {
+        if (!loginCalled) return;
+        if (polybaseContext.loading) return;
+        if (polybaseContext.isProfileExists) {
+            notifications.update({
+                id: "login",
+                title: "Logged in",
+                message: "You are now logged in",
+                autoClose: true,
+                color: "green",
+            });
+            setLoginCalled(false);
+            router.push("/dashboard");
+        } else {
+            setLoginCalled(false);
+
+            // Logout
+            (async () => {
+                if (!safeContext.safeAuth) return;
+                await safeContext.safeAuth.signOut();
+                sessionStorage.removeItem("safeAuthSignInResponse");
+                sessionStorage.removeItem("provider");
+                safeContext.setProvider(null);
+                safeContext.setSafeAuthSignInResponse(null);
+            })();
+
+            notifications.update({
+                id: "login",
+                title: "Profile not found",
+                message: "Please register first",
+                autoClose: true,
+                color: "red",
+            });
+        }
+    }, [loginCalled, polybaseContext.loading]);
     const login = async () => {
         if (!safeContext.safeAuth) return;
         notifications.show({
@@ -27,28 +63,12 @@ export default function Login() {
                 "safeAuthSignInResponse",
                 JSON.stringify(response)
             );
-            // sessionStorage.setItem(
-            //     "provider",
-            //     JSON.stringify(ctx.safeAuth.getProvider())
-            // );
-            console.log("SIGN IN RESPONSE: ", response);
-            const { eoa } = response as { eoa: `0x${string}` };
-            const profile = await getProfile(eoa);
-            console.log("PROFILE: ", profile);
-            polybaseContext.setUser(profile.response.data as User);
-
+            // console.log("SIGN IN RESPONSE: ", response);
             safeContext.setSafeAuthSignInResponse(response);
             safeContext.setProvider(
                 safeContext.safeAuth.getProvider() as SafeEventEmitterProvider
             );
-            notifications.update({
-                id: "login",
-                title: "Logged in",
-                message: "You are now logged in",
-                autoClose: true,
-                color: "green",
-            });
-            router.push("/dashboard");
+            setLoginCalled(true);
         } catch (e) {
             console.log("SIGN IN ERROR: ", e);
             notifications.update({
