@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-type User = {
+export type User = {
     id: string;
     name: string;
     description: string;
 };
 
-type MultiSig = {
+export type MultiSig = {
     id: string;
     owners: string[];
     threshold: number;

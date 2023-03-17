@@ -5,13 +5,15 @@ import { loginStyles } from "@/styles/login.styles";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { getProfile } from "@/lib/polybase";
+import PolybaseContext, { User } from "@/contexts/PolybaseContext";
 
 export default function Login() {
-    const ctx = useContext(SafeAuthContext);
+    const safeContext = useContext(SafeAuthContext);
+    const polybaseContext = useContext(PolybaseContext);
     const router = useRouter();
     const { classes } = loginStyles();
     const login = async () => {
-        if (!ctx.safeAuth) return;
+        if (!safeContext.safeAuth) return;
         notifications.show({
             id: "login",
             title: "Logging in...",
@@ -20,7 +22,7 @@ export default function Login() {
             loading: true,
         });
         try {
-            const response = await ctx.safeAuth.signIn();
+            const response = await safeContext.safeAuth.signIn();
             sessionStorage.setItem(
                 "safeAuthSignInResponse",
                 JSON.stringify(response)
@@ -33,10 +35,11 @@ export default function Login() {
             const { eoa } = response as { eoa: `0x${string}` };
             const profile = await getProfile(eoa);
             console.log("PROFILE: ", profile);
+            polybaseContext.setUser(profile.response.data as User);
 
-            ctx.setSafeAuthSignInResponse(response);
-            ctx.setProvider(
-                ctx.safeAuth.getProvider() as SafeEventEmitterProvider
+            safeContext.setSafeAuthSignInResponse(response);
+            safeContext.setProvider(
+                safeContext.safeAuth.getProvider() as SafeEventEmitterProvider
             );
             notifications.update({
                 id: "login",
