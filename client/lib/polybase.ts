@@ -4,7 +4,14 @@ interface Profile {
     id: `0x${string}`
     name?: string
     description?: string
-    image?: string
+}
+
+interface Safe {
+    id: `0x${string}`
+    name?: string
+    description?: string
+    owners?: Profile["id"][]
+    threshold?: number
 }
 
 export const createProfile = async (profile: Profile) => {
@@ -16,10 +23,26 @@ export const createProfile = async (profile: Profile) => {
         },
         body: JSON.stringify({id, collection: "User"}),
     })
-    if(response.status !== 200){
+    if (response.status !== 200) {
         throw new Error("Error creating profile")
     }
     return response.json()
+}
+
+export const createSafe = async (safe: Safe) => {
+    const {id, name, description, owners, threshold} = safe
+    const response = await axios.post(`/api/polybase`, {
+        id,
+        collection: "MultiSig",
+        name,
+        description,
+        owners,
+        threshold
+    })
+    if(response.status !== 200){
+        throw new Error("Error creating safe")
+    }
+    return response.data
 }
 
 export const updateProfile = async (profile: Profile) => {
@@ -29,9 +52,9 @@ export const updateProfile = async (profile: Profile) => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({id, name, description: "", image: "", collection: "User"}),
+        body: JSON.stringify({id, name, description: "", collection: "User"}),
     })
-    if(response.status !== 200){
+    if (response.status !== 200) {
         throw new Error("Error updating profile")
     }
     return response.json()
@@ -44,7 +67,7 @@ export const getProfile = async (id: Profile["id"]) => {
             collection: "User"
         }
     })
-    if(response.status !== 200){
+    if (response.status !== 200) {
         throw new Error("Error getting profile")
     }
     return response.data

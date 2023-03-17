@@ -19,17 +19,15 @@ const schema = `
         // user publicAddress
         id: string;
         name?: string; 
-        description?: string; 
-        image?: string;
+        description?: string;
 
         constructor (id: string) {
             this.id = id;
         }
 
-        function updateRecord (name: string, description: string , image: string) {
+        function updateRecord (name: string, description: string) {
             this.name = name;
             this.description = description;
-            this.image = image;
         }
     }
 
@@ -60,26 +58,29 @@ const schema = `
         // multiSig public address
         id: string;
         owners: string[];
-        name?: string; 
-        description?: string; 
-        image?: string;
+        threshold: number;
+        name: string; 
+        description: string;
 
-        constructor (id: string, owners: string[], name: string, description: string, image: string) {
+        constructor (id: string, owners: string[], name: string, description: string, threshold: number) {
             this.id = id;
             this.owners = owners;
+            this.threshold = threshold;
             this.name = name;
             this.description = description;
-            this.image = image;
         }
 
-        function updateRecord (name: string, description: string , image: string) {
+        function updateRecord (name: string, description: string) {
             this.name = name;
             this.description = description;
-            this.image = image;
         }
 
         function updateOwners( newOwners : string[]) {
           this.owners = newOwners;
+        }
+        
+        function updateThreshold( newThreshold : number) {
+          this.threshold = newThreshold;
         }
     }
 
@@ -153,7 +154,7 @@ export default async function handler(
 ) {
     const db = signInPolybase();
 
-    // // Create a collection
+    // Create a collection
     // const createResponse = await db.applySchema(schema);
     // console.log(createResponse);
 
@@ -196,7 +197,8 @@ export default async function handler(
             res.status(400).json({response: "Invalid collection"});
         }
         return;
-    } else if (req.method === "POST") {
+    }
+    else if (req.method === "POST") {
         const {id} = body;
         console.log(body, body.id, id)
         if (!id) {
@@ -208,7 +210,8 @@ export default async function handler(
             // Create a record
             const response = await db.collection("User").create([id as string]);
             res.status(200).json({response: response});
-        } else if (req.body.collection === "Posts") {
+        }
+        else if (req.body.collection === "Posts") {
             const {userAddress, body} = req.body;
             if (!userAddress || !body) {
                 res.status(400).json({response: "Missing required fields"});
@@ -219,16 +222,17 @@ export default async function handler(
                 .collection("Posts")
                 .create([id as string, userAddress, body]);
             res.status(200).json({response: response});
-        } else if (req.body.collection === "MultiSig") {
-            const {owners, name, description, image} = req.body;
-            if (!owners || !name || !description || !image) {
+        }
+        else if (req.body.collection === "MultiSig") {
+            const {owners, name, description, threshold} = req.body;
+            if (!body.hasOwnProperty("owners") || !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("threshold")) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
             }
             // Create a record
             const response = await db
                 .collection("MultiSig")
-                .create([id as string, owners, name, description, image]);
+                .create([id as string, owners, name, description, threshold]);
             res.status(200).json({response: response});
         } else if (req.body.collection === "MultiSigProposals") {
             const {proposalHash, name, description, image} = req.body;
@@ -245,27 +249,29 @@ export default async function handler(
             res.status(400).json({response: "Invalid collection"});
             return;
         }
-    } else if (req.method === "PATCH") {
+    }
+    else if (req.method === "PATCH") {
         const {id} = body;
         if (!id) {
             res.status(400).json({response: "Missing required field 'id'"});
             return;
         }
         if (req.body.collection === "User") {
-            const {name, description, image} = body;
-            if (!body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image")) {
+            const {name, description} = body;
+            if (!body.hasOwnProperty("name") || !body.hasOwnProperty("description")) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("User")
                 .record(id as string)
-                .call("updateRecord", [name, description, image]);
+                .call("updateRecord", [name, description]);
             res.status(200).json({response: recordData});
             return;
-        } else if (req.body.collection === "Posts") {
+        }
+        else if (req.body.collection === "Posts") {
             const {media, mediaType} = body;
-            if (!media || !mediaType) {
+            if (!body.hasOwnProperty("media") || !body.hasOwnProperty("mediaType")) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
             }
@@ -275,16 +281,33 @@ export default async function handler(
                 .call("updateRecord", [media, mediaType]);
             res.status(200).json({response: recordData});
             return;
-        } else if (req.body.collection === "MultiSig") {
-            const {name, description, image} = req.body;
-            if (!name || !description || !image) {
+        }
+        else if (req.body.collection === "MultiSig") {
+            const {name, description,owners, threshold} = req.body;
+            if(body.hasOwnProperty("threshold")){
+                const recordData = await db
+                .collection("MultiSig")
+                .record(id as string)
+                .call("updateThreshold", [threshold]);
+                res.status(200).json({response: recordData});
+                return;
+            }
+            if(body.hasOwnProperty("owners")){
+                const recordData = await db
+                .collection("MultiSig")
+                .record(id as string)
+                .call("updateOwners", [owners]);
+                res.status(200).json({response: recordData});
+                return;
+            }
+            if (!body.hasOwnProperty("name")  || !body.hasOwnProperty("description") ) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
             }
             const recordData = await db
                 .collection("MultiSig")
                 .record(id as string)
-                .call("updateRecord", [name, description, image]);
+                .call("updateRecord", [name, description]);
             res.status(200).json({response: recordData});
             return;
         } else if (req.body.collection === "MultiSigProposals") {

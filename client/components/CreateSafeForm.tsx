@@ -6,6 +6,7 @@ import SafeAuthContext from "@/contexts/SafeAuthContext";
 import {useContext} from "react";
 import axios from "axios";
 import {showNotification, updateNotification} from "@mantine/notifications";
+import {createSafe} from "@/lib/polybase";
 
 export default function CreateSafeForm() {
     const ctx = useContext(SafeAuthContext)
@@ -42,6 +43,16 @@ export default function CreateSafeForm() {
             })
             const safeAddress = response.data.safeAddress
             console.log(safeAddress)
+
+            const safePolybaseResponse = await createSafe({
+                id: safeAddress,
+                name: values.name,
+                description: values.description,
+                owners: owners as `0x${string}`[],
+                threshold: values.threshold,
+            })
+            console.log("Safe created in Polybase", safePolybaseResponse)
+
             updateNotification({
                 id: "create-safe",
                 title: "Safe created!",
