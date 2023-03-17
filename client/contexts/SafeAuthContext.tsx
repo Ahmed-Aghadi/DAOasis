@@ -6,7 +6,7 @@ import {
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import React, { useEffect, useState } from "react";
 import { getRpc } from "@/lib/getRpc";
-import {getProfile} from "@/lib/polybase";
+import { getProfile } from "@/lib/polybase";
 
 const SafeAuthContext = React.createContext({
     loading: true,
@@ -37,14 +37,16 @@ export const SafeAuthContextProvider = (props: any) => {
             setLoading(false);
             return;
         }
-        const data = JSON.parse(sessionStorage.getItem("safeAuthSignInResponse")!)
+        const data = JSON.parse(
+            sessionStorage.getItem("safeAuthSignInResponse")!
+        );
         setChainId(data.chainId);
         setSafeAuthSignInResponse(data);
         setLoading(false);
     }, []);
 
     useEffect(() => {
-        if(loading) return;
+        if (loading) return;
         (async () => {
             console.log("CHAIN ID", chainId);
             const rpc = getRpc(chainId);
@@ -61,9 +63,8 @@ export const SafeAuthContextProvider = (props: any) => {
                 },
             });
             console.log("INITIALIZED SAFE AUTH KIT", data);
-            if(safeAuthSignInResponse?.eoa){
-                console.log(safeAuthSignInResponse, "ahmed ki shanti ke liye")
-                const response = await data!.signIn()
+            if (safeAuthSignInResponse?.eoa) {
+                const response = await data!.signIn();
                 sessionStorage.setItem(
                     "safeAuthSignInResponse",
                     JSON.stringify(response)
@@ -74,14 +75,11 @@ export const SafeAuthContextProvider = (props: any) => {
                 console.log("PROFILE: ", profile);
 
                 setSafeAuthSignInResponse(response);
-                setProvider(
-                    data!.getProvider() as SafeEventEmitterProvider
-                );
+                setProvider(data!.getProvider() as SafeEventEmitterProvider);
             }
             setSafeAuth(data);
         })();
-    }, [chainId,loading]);
-
+    }, [chainId, loading]);
 
     return (
         <SafeAuthContext.Provider
