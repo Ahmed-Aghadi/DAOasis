@@ -69,10 +69,7 @@ export const SafeAuthContextProvider = (props: any) => {
                     "safeAuthSignInResponse",
                     JSON.stringify(response)
                 );
-                console.log("SIGN IN RESPONSE: ", response);
-                const { eoa } = response as { eoa: `0x${string}` };
-                const profile = await getProfile(eoa);
-                console.log("PROFILE: ", profile);
+                console.log("SIGN IN RESPONSE: ", response)
 
                 setSafeAuthSignInResponse(response);
                 setProvider(data!.getProvider() as SafeEventEmitterProvider);

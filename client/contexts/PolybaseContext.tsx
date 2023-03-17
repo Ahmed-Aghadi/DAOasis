@@ -47,18 +47,21 @@ export const PolybaseContextProvider = (props: any) => {
     const [isProfileExists, setIsProfileExists] = useState(false);
 
     useEffect(() => {
+        console.log("SAFE CONTEXT: ", safeContext.safeAuthSignInResponse)
         if (!safeContext.safeAuthSignInResponse?.eoa) return;
         const { eoa } = safeContext.safeAuthSignInResponse as {
             eoa: `0x${string}`;
         };
         (async () => {
+            console.log("LOADING: ", loading)
             setLoading(true);
             try {
+                console.log("EOA: ", eoa);
                 const profile = await getProfile(eoa);
-                // console.log("PROFILE: ", profile);
+                console.log("PROFILE: ", profile);
                 setUser(profile.response.data as User);
                 const allSafe = await getAllSafe();
-                // console.log("ALL SAFE: ", allSafe);
+                console.log("ALL SAFE: ", allSafe);
                 const userSafes = allSafe.response.data.filter(
                     (safe: { data: MultiSig }) => {
                         return safe.data.owners.includes(eoa); // NOTE: Might need to check for lowercase and uppercase in the future

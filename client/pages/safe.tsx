@@ -76,6 +76,7 @@ export default function Home() {
             to: "0x4CA5FE129837E965e49b507cfE36c0dc574e8864",
             value: ethers.utils.parseEther("0.001").toString(),
             data: "0x",
+            operation: OperationType.Call,
         };
         const safeTransaction = await safe.createTransaction({
             safeTransactionData,
@@ -146,9 +147,11 @@ export default function Home() {
         const safeTxHash = transaction.safeTxHash;
 
         // Get the transaction
-        const safeTransaction = transaction;
+        const safeTransaction = await service.getTransaction(safeTxHash);
+        console.log("safeTransaction", safeTransaction);
 
         const isTxExecutable = await safe.isValidTransaction(safeTransaction);
+        console.log("isTxExecutable", isTxExecutable);
 
         if (isTxExecutable) {
             // Execute the transaction

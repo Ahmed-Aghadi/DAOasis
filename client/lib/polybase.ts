@@ -63,14 +63,16 @@ export const updateProfile = async (profile: Profile) => {
 };
 
 export const getProfile = async (id: Profile["id"]) => {
+    console.log("id",id)
     const response = await axios.get(`/api/polybase`, {
         params: {
             id,
             collection: "User",
         },
     });
+    console.log("sonme vbsd",response)
     if (response.status !== 200) {
-        throw new Error("Error getting profile");
+        return new Error("Error getting profile");
     }
     return response.data;
 };

@@ -14,6 +14,7 @@ export default function Login() {
     const { classes } = loginStyles();
     const [loginCalled, setLoginCalled] = useState(false);
     useEffect(() => {
+        console.log(loginCalled, polybaseContext.loading, polybaseContext.isProfileExists)
         if (!loginCalled) return;
         if (polybaseContext.loading) return;
         if (polybaseContext.isProfileExists) {
@@ -26,9 +27,10 @@ export default function Login() {
             });
             setLoginCalled(false);
             router.push("/dashboard");
-        } else {
+        }
+        else {
             setLoginCalled(false);
-
+            console.log("PROFILE NOT FOUND");
             // Logout
             (async () => {
                 if (!safeContext.safeAuth) return;
@@ -47,7 +49,7 @@ export default function Login() {
                 color: "red",
             });
         }
-    }, [loginCalled, polybaseContext.loading]);
+    }, [loginCalled, polybaseContext.loading, polybaseContext.isProfileExists]);
     const login = async () => {
         if (!safeContext.safeAuth) return;
         notifications.show({
@@ -63,7 +65,7 @@ export default function Login() {
                 "safeAuthSignInResponse",
                 JSON.stringify(response)
             );
-            // console.log("SIGN IN RESPONSE: ", response);
+            console.log("SIGN IN RESPONSE: ", response);
             safeContext.setSafeAuthSignInResponse(response);
             safeContext.setProvider(
                 safeContext.safeAuth.getProvider() as SafeEventEmitterProvider
