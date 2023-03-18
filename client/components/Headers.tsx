@@ -26,6 +26,7 @@ const useStyles = createStyles((theme) => ({
         position: "relative",
         zIndex: 1,
         marginBottom: -76,
+
     },
 
     dropdown: {
@@ -46,9 +47,11 @@ const useStyles = createStyles((theme) => ({
 
     header: {
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "space-evenly",
         alignItems: "center",
         height: "100%",
+        width: "100%",
+        maxWidth: "100%",
     },
 
     links: {
