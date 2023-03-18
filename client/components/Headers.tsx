@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import { useContext, useState } from "react";
 import {
     createStyles,
     Header,
@@ -11,7 +11,7 @@ import {
     Text,
     Button,
 } from "@mantine/core";
-import {useDisclosure} from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import logo from "@/public/logo-wo-bg.png";
 import Link from "next/link";
 import Image from "next/image";
@@ -123,9 +123,9 @@ const links = [
 ];
 
 export function HeaderResponsive() {
-    const [opened, {toggle, close}] = useDisclosure(false);
+    const [opened, { toggle, close }] = useDisclosure(false);
     const [active, setActive] = useState(links[0].link);
-    const {classes, cx} = useStyles();
+    const { classes, cx } = useStyles();
     const ctx = useContext(SafeAuthContext);
 
     const items = links.map((link) => (
@@ -149,7 +149,7 @@ export function HeaderResponsive() {
         <Header height={HEADER_HEIGHT} className={classes.root}>
             <Container className={classes.header}>
                 <Link href="/dashboard">
-                    <Image src={logo} alt={"logo"} width={300}/>
+                    <Image src={logo} alt={"logo"} width={300} />
                 </Link>
                 <Group spacing={5} className={classes.links}>
                     {items}
@@ -157,12 +157,12 @@ export function HeaderResponsive() {
                 <Group spacing={5}>
                     <Text color="white" size="sm">
                         {`${ctx.safeAuthSignInResponse?.eoa.slice(
-                                0,
-                                6
-                            )}...${ctx.safeAuthSignInResponse?.eoa.slice(-4)}` ||
+                            0,
+                            6
+                        )}...${ctx.safeAuthSignInResponse?.eoa.slice(-4)}` ||
                             "Not logged in"}
                     </Text>
-                    <Logout/>
+                    <Logout />
                 </Group>
 
                 <Burger
