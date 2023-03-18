@@ -1,4 +1,4 @@
-import {useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import {
     createStyles,
     Header,
@@ -10,6 +10,8 @@ import {
     rem,
     Text,
     Button,
+    Menu,
+    UnstyledButton, Avatar,
 } from "@mantine/core";
 import {useDisclosure} from "@mantine/hooks";
 import logo from "@/public/logo-wo-bg.png";
@@ -17,6 +19,11 @@ import Link from "next/link";
 import Image from "next/image";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import Logout from "@/components/Logout";
+import {IconChevronDown, IconMessage} from "@tabler/icons-react";
+import PolybaseContext from "@/contexts/PolybaseContext";
+import {IconHeart, IconStar} from "@tabler/icons-react";
+import makeBlockie from "ethereum-blockies-base64";
+import { useRouter } from "next/router";
 
 const HEADER_HEIGHT = rem(95);
 
@@ -72,18 +79,12 @@ const useStyles = createStyles((theme) => ({
         padding: `${rem(8)} ${rem(12)}`,
         borderRadius: theme.radius.sm,
         textDecoration: "none",
-        color:
-            theme.colorScheme === "dark"
-                ? theme.colors.dark[0]
-                : theme.colors.gray[7],
+        color: theme.colors.blueTheme[1],
         fontSize: theme.fontSizes.sm,
         fontWeight: 500,
 
         "&:hover": {
-            backgroundColor:
-                theme.colorScheme === "dark"
-                    ? theme.colors.dark[6]
-                    : theme.colors.gray[0],
+            backgroundColor: theme.colors.blueTheme[3]
         },
 
         [theme.fn.smallerThan("sm")]: {
@@ -94,42 +95,81 @@ const useStyles = createStyles((theme) => ({
 
     linkActive: {
         "&, &:hover": {
-            backgroundColor: theme.fn.variant({
-                variant: "light",
-                color: theme.primaryColor,
-            }).background,
-            color: theme.fn.variant({
-                variant: "light",
-                color: theme.primaryColor,
-            }).color,
+            backgroundColor: theme.colors.blueTheme[4],
+            color: theme.colors.blueTheme[1],
         },
+    },
+    user: {
+        color: theme.white,
+        padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
+        borderRadius: theme.radius.sm,
+        transition: 'background-color 100ms ease',
+
+        '&:hover': {
+            backgroundColor: theme.fn.lighten(
+                theme.colors.blueTheme[4],
+                0.1
+            ),
+        },
+
+        [theme.fn.smallerThan('xs')]: {
+            display: 'none',
+        },
+    },
+
+    userActive: {
+        backgroundColor: theme.fn.lighten(
+            theme.colors.blueTheme[0],
+            0.1
+        ),
     },
 }));
 
 const links = [
     {
-        link: "/about",
-        label: "Features",
+        link: "/dashboard",
+        label: "Dashboard",
     },
     {
-        link: "/pricing",
-        label: "Pricing",
-    },
-    {
-        link: "/learn",
-        label: "Learn",
-    },
-    {
-        link: "/community",
-        label: "Community",
+        link: "/apps",
+        label: "Explore Apps",
     },
 ];
 
 export function HeaderResponsive() {
     const [opened, {toggle, close}] = useDisclosure(false);
-    const [active, setActive] = useState(links[0].link);
-    const {classes, cx} = useStyles();
-    const ctx = useContext(SafeAuthContext);
+    const router = useRouter();
+    const [active, setActive] = useState(router.pathname);
+    const {classes, theme, cx} = useStyles();
+    const safeContext = useContext(SafeAuthContext);
+    const polybaseContext = useContext(PolybaseContext);
+    const [userMenuOpened, setUserMenuOpened] = useState(false);
+
+    const MenuDropdown = (
+        <Menu width={260} position="bottom-end" transitionProps={{transition: 'pop-top-right'}}
+              onClose={() => setUserMenuOpened(false)} onOpen={() => setUserMenuOpened(true)} withinPortal>
+            <Menu.Target>
+                <UnstyledButton
+                    className={cx(classes.user, {[classes.userActive]: userMenuOpened})}
+                >
+                    <Group spacing={7}>
+                        <Avatar src={makeBlockie(safeContext.safeAuthSignInResponse?.eoa || "0x00000")} alt={"pfp"}
+                                radius="xl" size={20}/>
+                        <Text weight={500} size="sm" sx={{lineHeight: 1, color: theme.white}} mr={3}>
+                            {polybaseContext.user?.name}
+                        </Text>
+                        <IconChevronDown size={rem(12)} stroke={1.5}/>
+                    </Group>
+                </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+                <Menu.Item
+                    icon={<IconHeart size="0.9rem" stroke={1.5} color={theme.colors.red[6]}/>}
+                >
+                    Liked posts
+                </Menu.Item>
+            </Menu.Dropdown>
+        </Menu>)
 
     const items = links.map((link) => (
         <Link
@@ -138,11 +178,6 @@ export function HeaderResponsive() {
             className={cx(classes.link, {
                 [classes.linkActive]: active === link.link,
             })}
-            onClick={(event) => {
-                event.preventDefault();
-                setActive(link.link);
-                close();
-            }}
         >
             {link.label}
         </Link>
@@ -151,22 +186,13 @@ export function HeaderResponsive() {
     return (
         <Header height={HEADER_HEIGHT} className={classes.root}>
             <Container className={classes.header}>
-                <Link href="/dashboard">
+                <Link href="/">
                     <Image src={logo} alt={"logo"} width={300}/>
                 </Link>
                 <Group spacing={5} className={classes.links}>
                     {items}
                 </Group>
-                <Group spacing={5}>
-                    <Text color="white" size="sm">
-                        {`${ctx.safeAuthSignInResponse?.eoa.slice(
-                                0,
-                                6
-                            )}...${ctx.safeAuthSignInResponse?.eoa.slice(-4)}` ||
-                            "Not logged in"}
-                    </Text>
-                    <Logout/>
-                </Group>
+                {MenuDropdown}
 
                 <Burger
                     opened={opened}
@@ -175,19 +201,33 @@ export function HeaderResponsive() {
                     size="sm"
                 />
 
+
                 <Transition
                     transition="pop-top-right"
                     duration={200}
                     mounted={opened}
                 >
                     {(styles) => (
-                        <Paper
-                            className={classes.dropdown}
-                            withBorder
-                            style={styles}
-                        >
-                            {items}
-                        </Paper>
+                        <>
+                            <Paper
+                                className={classes.dropdown}
+                                withBorder
+                                style={styles}
+                            >
+                                {items}
+                                <Group spacing={5}>
+                                    <Text color="white" size="sm">
+                                        {`${safeContext.safeAuthSignInResponse?.eoa.slice(
+                                                0,
+                                                6
+                                            )}...${safeContext.safeAuthSignInResponse?.eoa.slice(-4)}` ||
+                                            "Not logged in"}
+                                    </Text>
+                                    <Logout/>
+                                </Group>
+                                {MenuDropdown}
+                            </Paper>
+                        </>
                     )}
                 </Transition>
             </Container>
