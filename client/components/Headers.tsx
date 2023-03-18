@@ -11,19 +11,19 @@ import {
     Text,
     Button,
     Menu,
-    UnstyledButton, Avatar,
+    UnstyledButton, Avatar, Tooltip,
 } from "@mantine/core";
-import {useDisclosure} from "@mantine/hooks";
+import {useClipboard, useDisclosure} from "@mantine/hooks";
 import logo from "@/public/logo-wo-bg.png";
 import Link from "next/link";
 import Image from "next/image";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import Logout from "@/components/Logout";
-import {IconChevronDown, IconMessage} from "@tabler/icons-react";
+import {IconChevronDown, IconCopy, IconMessage} from "@tabler/icons-react";
 import PolybaseContext from "@/contexts/PolybaseContext";
 import {IconHeart, IconStar} from "@tabler/icons-react";
 import makeBlockie from "ethereum-blockies-base64";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 const HEADER_HEIGHT = rem(95);
 
@@ -138,6 +138,7 @@ const links = [
 
 export function HeaderResponsive() {
     const [opened, {toggle, close}] = useDisclosure(false);
+    const clipboard = useClipboard()
     const router = useRouter();
     const [active, setActive] = useState(router.pathname);
     const {classes, theme, cx} = useStyles();
@@ -163,11 +164,16 @@ export function HeaderResponsive() {
                 </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown>
-                <Menu.Item
-                    icon={<IconHeart size="0.9rem" stroke={1.5} color={theme.colors.red[6]}/>}
-                >
-                    Liked posts
-                </Menu.Item>
+                <Tooltip label={"Copy your address"} position={"top"}>
+                    <Menu.Item
+                        icon={<IconCopy size="0.9rem" stroke={1.5} color={theme.colors.red[6]}/>}
+                        onClick={() => {
+                            clipboard.copy(safeContext.safeAuthSignInResponse?.eoa)
+                        }}
+                    >
+                        {clipboard.copied ? 'Copied' : `${safeContext.safeAuthSignInResponse?.eoa.slice(0, 12)}...${safeContext.safeAuthSignInResponse?.eoa.slice(-11)}`}
+                    </Menu.Item>
+                </Tooltip>
             </Menu.Dropdown>
         </Menu>)
 
