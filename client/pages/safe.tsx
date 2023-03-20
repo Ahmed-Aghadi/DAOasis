@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Head from "next/head";
-import { Button, Group, Modal } from "@mantine/core";
+import { Badge, Button, Group, Modal, Skeleton, Text } from "@mantine/core";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
@@ -14,190 +14,105 @@ import {
     OperationType,
     SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
+import { useRouter } from "next/router";
+import { getProfile, getSafe } from "@/lib/polybase";
+import { CustomSkeleton } from "@/components/CustomSkeleton";
+import { useDisclosure } from "@mantine/hooks";
+import { OwnersDetails } from "@/components/OwnersDetails";
 
 const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
 
 export default function Home() {
-    const [modalOpened, setModalOpened] = useState(false);
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [isValid, setIsValid] = useState(false);
+    const safeAddress = router.query.address as `0x${string}`;
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [chainId, setChainId] = useState("");
+    const [threshold, setThreshold] = useState(0);
+    const [owners, setOwners] = useState<string[]>([]);
+    const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
+    const [opened, { open, close }] = useDisclosure(false);
 
-    const open = () => {
-        setModalOpened(true);
-    };
-
-    const modal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)}>
-            <CreateSafeForm />
-        </Modal>
-    );
-    const getSafeService = async () => {
-        // Using ethers
-        const provider = new ethers.providers.Web3Provider(
-            safeContext?.safeAuth?.getProvider()!
-        );
-        const signer = provider.getSigner();
-
-        // Create EthAdapter instance
-        const ethAdapter = new EthersAdapter({
-            ethers,
-            signerOrProvider: signer,
-        });
-
-        // Create Safe instance
-        const safe = await Safe.create({
-            ethAdapter,
-            safeAddress,
-        });
-
-        // Create Safe Service Client instance
-        const service = new SafeServiceClient({
-            txServiceUrl: getTxService("0x5"),
-            ethAdapter,
-        });
-
-        console.log("getSafeService", {
-            signer,
-            safe,
-            service,
-        });
-        return {
-            signer,
-            safe,
-            service,
-        };
-    };
-
-    const proposeTransaction = async () => {
-        const { signer, safe, service } = await getSafeService();
-
-        // Create transaction
-        const safeTransactionData: SafeTransactionDataPartial = {
-            to: "0x4CA5FE129837E965e49b507cfE36c0dc574e8864",
-            value: ethers.utils.parseEther("0.001").toString(),
-            data: "0x",
-            operation: OperationType.Call,
-        };
-        const safeTransaction = await safe.createTransaction({
-            safeTransactionData,
-        });
-
-        const senderAddress = await signer.getAddress();
-        const safeTxHash = await safe.getTransactionHash(safeTransaction);
-        const signature = await safe.signTransactionHash(safeTxHash);
-
-        // Propose transaction to the service
-        await service.proposeTransaction({
-            safeAddress,
-            safeTransactionData: safeTransaction.data,
-            safeTxHash,
-            senderAddress,
-            senderSignature: signature.data,
-        });
-
-        console.log("Proposed a transaction with Safe:", safeAddress);
-        console.log("- safeTxHash:", safeTxHash);
-        console.log("- Sender:", senderAddress);
-        console.log("- Sender signature:", signature.data);
-    };
-
-    const getPendingTx = async () => {
-        const { safe, service } = await getSafeService();
-        const pendingTransactions = (
-            await service.getPendingTransactions(safeAddress)
-        ).results;
-        console.log("Pending transactions:", pendingTransactions);
-        return pendingTransactions;
-    };
-
-    const confirmTransaction = async () => {
-        const { signer, safe, service } = await getSafeService();
-        // Get the transaction
-        const transaction = (await getPendingTx())[0];
-        // const transactions = await service.getPendingTransactions()
-        // const transactions = await service.getIncomingTransactions()
-        // const transactions = await service.getMultisigTransactions()
-        // const transactions = await service.getModuleTransactions()
-        // const transactions = await service.getAllTransactions()
-
-        const safeTxHash = transaction.safeTxHash;
-        const signature = await safe.signTransactionHash(safeTxHash);
-
-        // Confirm the Safe transaction
-        const signatureResponse = await service.confirmTransaction(
-            safeTxHash,
-            signature.data
-        );
-
-        const signerAddress = await signer.getAddress();
-        console.log(
-            "Added a new signature to transaction with safeTxGas:",
-            safeTxHash
-        );
-        console.log("- Signer:", signerAddress);
-        console.log("- Signer signature:", signatureResponse.signature);
-    };
-
-    const executeTransaction = async () => {
-        const { safe, service } = await getSafeService();
-
-        // Get the transaction
-        const transaction = (await getPendingTx())[0];
-
-        const safeTxHash = transaction.safeTxHash;
-
-        // Get the transaction
-        const safeTransaction = await service.getTransaction(safeTxHash);
-        console.log("safeTransaction", safeTransaction);
-
-        const isTxExecutable = await safe.isValidTransaction(safeTransaction);
-        console.log("isTxExecutable", isTxExecutable);
-
-        if (isTxExecutable) {
-            // Execute the transaction
-            const txResponse = await safe.executeTransaction(safeTransaction);
-            const contractReceipt =
-                await txResponse.transactionResponse?.wait();
-
-            console.log("Transaction executed.");
-            console.log(
-                "- Transaction hash:",
-                contractReceipt?.transactionHash
-            );
-
-            console.log(
-                `https://goerli.etherscan.io/tx/${contractReceipt?.transactionHash}`
-            );
-        } else {
-            console.log("Transaction invalid. Transaction was not executed.");
+    useEffect(() => {
+        if (!router.isReady) return;
+        if (!safeAddress) {
+            setLoading(false);
+            setIsValid(false);
+            return;
         }
-    };
+        (async () => {
+            try {
+                const response = await getSafe(safeAddress);
+                setIsValid(true);
+                console.log("RESPONSE in safe: ", response);
+                const safe = response.response.data;
+                setName(safe.name);
+                setDescription(safe.description);
+                setChainId(safe.chainId);
+                setThreshold(safe.threshold);
+                setOwners(safe.owners);
+                const ownersDetails = await Promise.all(
+                    safe.owners.map(async (owner: `0x${string}`) => {
+                        const profile = await getProfile(owner);
+                        return profile.response.data;
+                    })
+                );
+                setOwnersDetails(ownersDetails);
+            } catch (error) {
+                console.log("ERROR in safe: ", error);
+                setIsValid(false);
+            }
+            setLoading(false);
+        })();
+    }, [router.isReady]);
 
     return (
         <Layout>
             <Head>
                 <title>Safe</title>
             </Head>
-            <h1>Safe</h1>
-            <button
-                onClick={() =>
-                    console.log({
-                        safeContext,
-                        userContext,
-                    })
-                }
-            >
-                ConsoleLog
-            </button>
-            <Group position="center">
-                <Button onClick={proposeTransaction}>
-                    Propose Transaction
-                </Button>
-                <Button onClick={getPendingTx}>Get Pending Tx</Button>
-                <Button onClick={confirmTransaction}> Confirm Tx</Button>
-                <Button onClick={executeTransaction}> Execute Tx</Button>
-            </Group>
-            {modal}
+            <CustomSkeleton visible={loading} radius="md" height={"100%"}>
+                <h1>{name}</h1>
+                <Text size={20} my={"md"} color="dimmed">
+                    {description}
+                </Text>
+                <Group position="center">
+                    <Badge
+                        variant="gradient"
+                        gradient={{ from: "teal", to: "lime", deg: 105 }}
+                    >
+                        Chain Id: {chainId}
+                    </Badge>
+                    <Badge
+                        variant="gradient"
+                        gradient={{ from: "teal", to: "blue", deg: 60 }}
+                        sx={{
+                            // on hover
+                            "&:hover": {
+                                cursor: "pointer",
+                                transform: "scale(1.1)",
+                            },
+                        }}
+                        size="lg"
+                        onClick={open}
+                    >
+                        Owners: {owners.length}
+                    </Badge>
+                    <Badge
+                        variant="gradient"
+                        gradient={{ from: "orange", to: "red" }}
+                    >
+                        Threshhold: {threshold}
+                    </Badge>
+                </Group>
+            </CustomSkeleton>
+            <Modal opened={opened} onClose={close} size="auto" title="Owners">
+                <OwnersDetails data={ownersDetails} />
+            </Modal>
         </Layout>
     );
 }

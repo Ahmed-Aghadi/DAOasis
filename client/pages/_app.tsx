@@ -9,8 +9,15 @@ import { PolybaseContextProvider } from "@/contexts/PolybaseContext";
 const myTheme: MantineThemeOverride = {
     colorScheme: "light",
     colors: {
-        blueTheme: ["#3304ba", "#fff", "#e1dbf5", "#c4b7eb", "#a793e1", "#eeebf7"],
-    }
+        blueTheme: [
+            "#3304ba",
+            "#fff",
+            "#e1dbf5",
+            "#c4b7eb",
+            "#a793e1",
+            "#eeebf7",
+        ],
+    },
 };
 
 export default function App({ Component, pageProps }: AppProps) {
