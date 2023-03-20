@@ -19,7 +19,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import Logout from "@/components/Logout";
-import {IconChevronDown, IconCopy, IconMessage} from "@tabler/icons-react";
+import {IconChevronDown, IconCopy, IconLogout, IconMessage} from "@tabler/icons-react";
 import PolybaseContext from "@/contexts/PolybaseContext";
 import {IconHeart, IconStar} from "@tabler/icons-react";
 import makeBlockie from "ethereum-blockies-base64";
@@ -174,6 +174,11 @@ export function HeaderResponsive() {
                         {clipboard.copied ? 'Copied' : `${safeContext.safeAuthSignInResponse?.eoa.slice(0, 12)}...${safeContext.safeAuthSignInResponse?.eoa.slice(-11)}`}
                     </Menu.Item>
                 </Tooltip>
+                <Menu.Item
+                    icon={<IconLogout size="0.9rem" stroke={1.5} color={theme.colors.gray[7]}  />}
+                >
+                    <Logout/>
+                </Menu.Item>
             </Menu.Dropdown>
         </Menu>)
 

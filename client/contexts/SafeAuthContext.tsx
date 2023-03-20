@@ -16,6 +16,7 @@ const SafeAuthContext = React.createContext({
     provider: null as SafeEventEmitterProvider | null,
     setProvider: (provider: SafeEventEmitterProvider | null) => {},
     safeAuthSignInResponse: null as SafeAuthSignInData | null,
+    chainId: "0x5" as string,
     setChainId: (chainId: string) => {},
     setSafeAuthSignInResponse: (
         safeAuthSignInResponse: SafeAuthSignInData | null
@@ -84,6 +85,7 @@ export const SafeAuthContextProvider = (props: any) => {
                 loading,
                 setLoading,
                 safeAuth,
+                chainId,
                 setSafeAuth: (data) => {
                     console.log("SETTING SAFE AUTH", data);
                     setSafeAuth(data);

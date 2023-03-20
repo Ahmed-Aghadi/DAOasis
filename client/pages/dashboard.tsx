@@ -1,10 +1,15 @@
-import { Layout } from "@/components/Layout";
-import { useContext, useState } from "react";
+import {Layout} from "@/components/Layout";
+import {useContext, useState} from "react";
 import Head from "next/head";
-import {Button, Group, Modal, Skeleton, Title} from "@mantine/core";
+import {Button, Container, Grid, Group, Modal, Paper, SimpleGrid, Skeleton, Title} from "@mantine/core";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
+import EthersAdapter from "@safe-global/safe-ethers-lib";
+import {ethers} from "ethers";
+import {EtherscanProvider} from "@ethersproject/providers";
+import {intNumberFromHexString} from "@coinbase/wallet-sdk/dist/util";
+import Overview from "@/components/Overview";
 
 export default function Dashboard() {
     const [modalOpened, setModalOpened] = useState(false);
@@ -17,7 +22,7 @@ export default function Dashboard() {
 
     const modal = (
         <Modal opened={modalOpened} onClose={() => setModalOpened(false)}>
-            <CreateSafeForm />
+            <CreateSafeForm/>
         </Modal>
     );
 
@@ -26,21 +31,17 @@ export default function Dashboard() {
             <Head>
                 <title>Dashboard</title>
             </Head>
+            <SimpleGrid cols={2}>
+                <Overview/>
+                <Paper>
+                    Hello
+                </Paper>
+            </SimpleGrid>
         </Layout>
     );
 }
-            // <Title>Dashboard</Title>
-            // <button
-            //     onClick={() =>
-            //         console.log({
-            //             safeContext,
-            //             userContext,
-            //         })
-            //     }
-            // >
-            //     ConsoleLog
-            // </button>
-            // <Group position="center">
-            //     <Button onClick={open}>Create Safe </Button>
-            // </Group>
-            // {modal}
+// <Title>Dashboard</Title>
+// <Group position="center">
+//     <Button onClick={open}>Create Safe </Button>
+// </Group>
+// {modal}
