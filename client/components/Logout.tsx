@@ -1,6 +1,6 @@
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import { useContext } from "react";
-import {Button} from "@mantine/core";
+import { Button } from "@mantine/core";
 
 export default function Logout() {
     const ctx = useContext(SafeAuthContext);

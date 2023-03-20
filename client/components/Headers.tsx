@@ -26,7 +26,6 @@ const useStyles = createStyles((theme) => ({
         position: "relative",
         zIndex: 1,
         marginBottom: -76,
-
     },
 
     dropdown: {
