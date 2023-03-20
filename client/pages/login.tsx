@@ -16,7 +16,7 @@ export default function LoginPage() {
                     <Text size={35} my={"md"}>
                         Welcome to DAOasis
                     </Text>
-                    <ChainSelect/>
+                    <ChainSelect width={"350px"} label={"Select Chain"} />
                     <div style={{width: "50%"}}>
                         <Divider my="xs" variant={"solid"} labelPosition="center"/>
                     </div>

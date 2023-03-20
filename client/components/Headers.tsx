@@ -24,6 +24,7 @@ import PolybaseContext from "@/contexts/PolybaseContext";
 import {IconHeart, IconStar} from "@tabler/icons-react";
 import makeBlockie from "ethereum-blockies-base64";
 import {useRouter} from "next/router";
+import ChainSelect from "@/components/ChainSelect";
 
 const HEADER_HEIGHT = rem(95);
 
@@ -147,7 +148,7 @@ export function HeaderResponsive() {
     const [userMenuOpened, setUserMenuOpened] = useState(false);
 
     const MenuDropdown = (
-        <Menu width={260} position="bottom-end" transitionProps={{transition: 'pop-top-right'}}
+        <Menu width={260} position="bottom-end" transitionProps={{transition: 'pop-top-right'}} closeOnItemClick={false}
               onClose={() => setUserMenuOpened(false)} onOpen={() => setUserMenuOpened(true)} withinPortal>
             <Menu.Target>
                 <UnstyledButton
@@ -174,8 +175,11 @@ export function HeaderResponsive() {
                         {clipboard.copied ? 'Copied' : `${safeContext.safeAuthSignInResponse?.eoa.slice(0, 12)}...${safeContext.safeAuthSignInResponse?.eoa.slice(-11)}`}
                     </Menu.Item>
                 </Tooltip>
+                <Menu.Item>
+                    <ChainSelect />
+                </Menu.Item>
                 <Menu.Item
-                    icon={<IconLogout size="0.9rem" stroke={1.5} color={theme.colors.gray[7]}  />}
+                    icon={<IconLogout size="0.9rem" stroke={1.5} color={theme.colors.gray[7]}/>}
                 >
                     <Logout/>
                 </Menu.Item>

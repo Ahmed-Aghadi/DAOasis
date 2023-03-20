@@ -2,16 +2,17 @@ import { Select } from "@mantine/core";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import { useContext } from "react";
 
-export default function ChainSelect() {
-    const { setChainId } = useContext(SafeAuthContext);
+export default function ChainSelect(props: any) {
+    const { setChainId, chainId } = useContext(SafeAuthContext);
 
     return (
-        <div style={{ width: "350px" }}>
+        <div style={{ width: props.width }}>
             <Select
                 size={"md"}
-                label="Select chain"
+                label={props.label}
                 mb={"sm"}
                 placeholder="Defaults to Goerli"
+                defaultValue={chainId}
                 data={[
                     { label: "Gnosis", value: "0x64" },
                     { label: "Goerli", value: "0x5" },
