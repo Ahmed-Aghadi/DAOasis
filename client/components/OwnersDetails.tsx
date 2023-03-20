@@ -46,6 +46,7 @@ interface RowData {
     id: string;
     name: string;
     description: string;
+    exists: boolean;
 }
 
 interface TableSortProps {
@@ -85,13 +86,21 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
 function filterData(data: RowData[], search: string) {
     const query = search.toLowerCase().trim();
     return data.filter((item) =>
-        keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
+        keys(data[0]).some(
+            (key) => key !== "exists" && item[key].toLowerCase().includes(query)
+        )
     );
 }
 
 function sortData(
     data: RowData[],
-    payload: { sortBy: keyof RowData | null; reversed: boolean; search: string }
+    // payload: { sortBy: keyof RowData | null; reversed: boolean; search: string }
+    // remove boolean type exists from keyof RowData
+    payload: {
+        sortBy: keyof Omit<RowData, "exists"> | null;
+        reversed: boolean;
+        search: string;
+    }
 ) {
     const { sortBy } = payload;
 
@@ -114,10 +123,12 @@ function sortData(
 export function OwnersDetails({ data }: TableSortProps) {
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
-    const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
+    const [sortBy, setSortBy] = useState<keyof Omit<RowData, "exists"> | null>(
+        null
+    );
     const [reverseSortDirection, setReverseSortDirection] = useState(false);
 
-    const setSorting = (field: keyof RowData) => {
+    const setSorting = (field: keyof Omit<RowData, "exists">) => {
         const reversed = field === sortBy ? !reverseSortDirection : false;
         setReverseSortDirection(reversed);
         setSortBy(field);
@@ -137,8 +148,8 @@ export function OwnersDetails({ data }: TableSortProps) {
     };
 
     const rows = sortedData.map((row) => (
-        <tr key={row.name}>
-            <td>{row.name}</td>
+        <tr key={row.id}>
+            <td>{row.exists ? row.name : "-"}</td>
             <td>{row.id}</td>
         </tr>
     ));
@@ -176,7 +187,7 @@ export function OwnersDetails({ data }: TableSortProps) {
                             reversed={reverseSortDirection}
                             onSort={() => setSorting("id")}
                         >
-                            Email
+                            Address
                         </Th>
                     </tr>
                 </thead>

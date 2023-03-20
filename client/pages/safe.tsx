@@ -1,7 +1,15 @@
 import { Layout } from "@/components/Layout";
 import { useContext, useEffect, useState } from "react";
 import Head from "next/head";
-import { Badge, Button, Group, Modal, Skeleton, Text } from "@mantine/core";
+import {
+    Badge,
+    Button,
+    Center,
+    Group,
+    Modal,
+    Skeleton,
+    Text,
+} from "@mantine/core";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
@@ -50,6 +58,7 @@ export default function Home() {
                 setIsValid(true);
                 console.log("RESPONSE in safe: ", response);
                 const safe = response.response.data;
+                console.log("SAFE: ", safe);
                 setName(safe.name);
                 setDescription(safe.description);
                 setChainId(safe.chainId);
@@ -57,10 +66,21 @@ export default function Home() {
                 setOwners(safe.owners);
                 const ownersDetails = await Promise.all(
                     safe.owners.map(async (owner: `0x${string}`) => {
-                        const profile = await getProfile(owner);
-                        return profile.response.data;
+                        try {
+                            const profile = await getProfile(owner);
+                            return { ...profile.response.data, exists: true };
+                        } catch (error) {
+                            console.log("ERROR in safe: ", error);
+                            return {
+                                id: owner,
+                                name: "-",
+                                description: "-",
+                                exists: false,
+                            };
+                        }
                     })
                 );
+                console.log("OWNERS DETAILS: ", ownersDetails);
                 setOwnersDetails(ownersDetails);
             } catch (error) {
                 console.log("ERROR in safe: ", error);
@@ -76,10 +96,14 @@ export default function Home() {
                 <title>Safe</title>
             </Head>
             <CustomSkeleton visible={loading} radius="md" height={"100%"}>
-                <h1>{name}</h1>
-                <Text size={20} my={"md"} color="dimmed">
-                    {description}
-                </Text>
+                <Center>
+                    <h1>{name}</h1>
+                </Center>
+                <Center>
+                    <Text size={20} my={"md"} color="dimmed">
+                        {description}
+                    </Text>
+                </Center>
                 <Group position="center">
                     <Badge
                         variant="gradient"
