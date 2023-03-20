@@ -18,10 +18,12 @@ import {IconCheck, IconCopy, IconExternalLink} from "@tabler/icons-react";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import Link from "next/link";
 import CreateSafeForm from "@/components/CreateSafeForm";
+import PolybaseContext from "@/contexts/PolybaseContext";
 
 export default function SafesOverview() {
     const [loading, setLoading] = useState(true);
     const safeContext = useContext(SafeAuthContext);
+    const polybaseContext = useContext(PolybaseContext);
     const [modalOpened, setModalOpened] = useState(false);
 
     const open = () => {
@@ -37,6 +39,7 @@ export default function SafesOverview() {
     useEffect(() => {
         setTimeout(() => {
             setLoading(false)
+            console.log("pc", polybaseContext.multiSigs)
         }, 2000)
     }, [])
 
@@ -52,20 +55,21 @@ export default function SafesOverview() {
                 <ScrollArea h={235}>
                     <Table ml={"md"} p={"sm"}>
                         <tbody>
-                        {safeContext.safeAuthSignInResponse?.safes!.map((safe, index) => (
+                        {polybaseContext.multiSigs!.map((safe, index) => (
                                 <tr key={index} style={{padding: "10px 0"}}>
                                     <td>
                                         <Group spacing="xs">
-                                            <Avatar src={makeBlockie(safe)} size="lg" radius="xl"/>
+                                            <Avatar src={makeBlockie(safe.id)} size="lg" radius="xl"/>
+                                            <Text color="white">{safe.name}</Text>
                                         </Group>
                                     </td>
                                     <td>
                                         <Group px={"xs"} position="apart">
-                                            <Link href={`/safe?address=${safe}`}
+                                            <Link href={`/safe?address=${safe.id}`}
                                                   style={{cursor: "pointer", color: "white", fontSize: "1rem"}}>
-                                                {safe}
+                                                {safe.id.slice(0, 10) + "..." + safe.id.slice(-10)}
                                             </Link>
-                                            <CopyButton value={safe} timeout={2000}>
+                                            <CopyButton value={safe.id} timeout={2000}>
                                                 {({copied, copy}) => (
                                                     <Tooltip label={copied ? "Copied" : "Copy"} position="top">
                                                         <ActionIcon

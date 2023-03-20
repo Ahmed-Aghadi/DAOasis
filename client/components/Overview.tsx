@@ -50,7 +50,9 @@ export default function Overview() {
                                 radius="xl"/>
                         <Text color="white">{userContext.user?.name}</Text>
                     </Group>
-                    <Button radius="lg">
+                    <Button radius="lg" sx={{
+                        backgroundColor: "#3304ba",
+                    }}>
                         <Text>{getChainDetails(safeContext.safeAuthSignInResponse?.chainId!).name}</Text>
                     </Button>
                 </Group>
@@ -68,7 +70,7 @@ export default function Overview() {
                     </CopyButton>
                     <ActionIcon component={"a"} target={"_blank"}
                                 href={`${getChainDetails(safeContext.safeAuthSignInResponse?.chainId!).explorer}${safeContext.safeAuthSignInResponse?.eoa}`}>
-                        <Tooltip label={"View on Etherscan"} position="top" withArrow>
+                        <Tooltip label={"View on Explorer"} position="top" withArrow>
                             <IconExternalLink color={"teal"} size="1rem"/>
                         </Tooltip>
                     </ActionIcon>
