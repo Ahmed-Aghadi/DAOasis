@@ -93,17 +93,18 @@ const schema = `
         id: string;
         // Transaction Hash of the safe propposal
         transactionHash?: string;
-        name: string; 
+        title: string; 
         description: string;
         createdAt: string;
+        creator: string;
         replies: Reply[];
 
-        constructor (id: string, proposalHash: string, name: string, description: string, createdAt: string) {
+        constructor (id: string, title: string, description: string, createdAt: string, creator: string) {
             this.id = id;
-            this.proposalHash = proposalHash;
-            this.name = name;
+            this.title = title;
             this.description = description;
             this.createdAt = createdAt;
+            this.creator = creator;
             this.replies = [];
         }
 
@@ -269,10 +270,11 @@ export default async function handler(
                 ]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "MultiSigProposals") {
-            const { name, description } = req.body;
+            const { title, description, creator } = req.body;
             if (
-                !body.hasOwnProperty("name") ||
-                !body.hasOwnProperty("description")
+                !body.hasOwnProperty("title") ||
+                !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("creator")
             ) {
                 res.status(400).json({ response: "Missing required fields" });
                 return;
@@ -282,7 +284,7 @@ export default async function handler(
             // Create a record
             const response = await db
                 .collection("MultiSigProposals")
-                .create([id as string, name, description, createdAt]);
+                .create([id as string, title, description, createdAt, creator]);
             res.status(200).json({ response: response });
         } else {
             res.status(400).json({ response: "Invalid collection" });
