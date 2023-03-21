@@ -110,8 +110,8 @@ const schema = `
             this.transactionHash = transactionHash;
         }
 
-        function addReply (id: string, description: string, createdAt: string) {
-            this.replies.push(new Reply(id, description, createdAt));
+        function addReply (reply: Reply) {
+            this.replies.push(reply);
         }
     }
 
