@@ -108,7 +108,6 @@ const schema = `
         }
 
         function addTransactionHash (transactionHash: string) {
-        function addTransactionHash (transactionHash: string) {
             this.transactionHash = transactionHash;
         }
 
