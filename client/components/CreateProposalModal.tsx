@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import {IconTrash} from "@tabler/icons-react";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import axios from "axios";
 import {showNotification, updateNotification} from "@mantine/notifications";
 import {createSafe} from "@/lib/polybase";
@@ -38,6 +38,8 @@ const style = (theme: any) => ({
 export default function CreateProposalModal({address}:{address: string}) {
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
+    const [loading, setLoading] = useState(false);
+
     const form = useForm({
         initialValues: {
             title: "",
@@ -54,10 +56,11 @@ export default function CreateProposalModal({address}:{address: string}) {
         title: string;
         description: string;
     }) => {
+        setLoading(true)
         showNotification({
             id: "create-safe",
-            title: "Creating Safe...",
-            message: "Please wait while we create your Safe",
+            title: "Creating Proposal...",
+            message: "Please wait while we create your proposal",
             loading: true,
             autoClose: false,
         });
@@ -66,8 +69,8 @@ export default function CreateProposalModal({address}:{address: string}) {
 
             updateNotification({
                 id: "create-safe",
-                title: "Safe created!",
-                message: `Safe created at`,
+                title: "Proposal created!",
+                message: "Your proposal has been created successfully",
                 autoClose: true,
                 color: "green",
             });
@@ -75,12 +78,13 @@ export default function CreateProposalModal({address}:{address: string}) {
             console.log(e);
             updateNotification({
                 id: "create-safe",
-                title: "Error creating Safe",
-                message: `Error creating Safe: ${e}`,
+                title: "Error creating proposal",
+                message: `Error creating proposal: ${e}`,
                 autoClose: true,
                 color: "red",
             });
         }
+        setLoading(false)
     };
 
     return (
@@ -103,7 +107,7 @@ export default function CreateProposalModal({address}:{address: string}) {
                 {...form.getInputProps(`description`)}
                 styles={(theme) => style(theme)}
             />
-            <Button fullWidth type="submit" mt="md" styles={(theme) => ({
+            <Button disabled={loading} fullWidth type="submit" mt="md" styles={(theme) => ({
                 root: {
                     backgroundColor: theme.colors.violet[6],
                     "&:hover": {
