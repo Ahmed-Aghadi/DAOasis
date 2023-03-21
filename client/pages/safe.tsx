@@ -30,6 +30,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { OwnersDetails } from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
 import { getRpc } from "@/lib/getRpc";
+import { parseAbiToFunction } from "@/lib/abiParse";
 
 const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
 
@@ -133,48 +134,6 @@ export default function Home() {
                     </CustomSkeleton>
                 </SimpleGrid>
             </Center>
-            <CustomSkeleton visible={loading} radius="md" height={"100%"}>
-                <Center>
-                    <h1>{name}</h1>
-                </Center>
-                <Center>
-                    <Text size={20} my={"md"} color="dimmed">
-                        {description}
-                    </Text>
-                </Center>
-                <Group position="center">
-                    <Badge
-                        variant="gradient"
-                        gradient={{ from: "teal", to: "lime", deg: 105 }}
-                    >
-                        Chain Id: {chainId}
-                    </Badge>
-                    <Badge
-                        variant="gradient"
-                        gradient={{ from: "teal", to: "blue", deg: 60 }}
-                        sx={{
-                            // on hover
-                            "&:hover": {
-                                cursor: "pointer",
-                                transform: "scale(1.1)",
-                            },
-                        }}
-                        size="lg"
-                        onClick={open}
-                    >
-                        Owners: {owners.length}
-                    </Badge>
-                    <Badge
-                        variant="gradient"
-                        gradient={{ from: "orange", to: "red" }}
-                    >
-                        Threshhold: {threshold}
-                    </Badge>
-                </Group>
-            </CustomSkeleton>
-            <Modal opened={opened} onClose={close} size="auto" title="Owners">
-                <OwnersDetails data={ownersDetails} />
-            </Modal>
         </Layout>
     );
 }
