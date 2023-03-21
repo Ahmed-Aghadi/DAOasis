@@ -91,6 +91,7 @@ const schema = `
     collection MultiSigProposals {
         // Multisig Address
         id: string;
+        multiSigId: string;
         // Transaction Hash of the safe propposal
         transactionHash?: string;
         title: string; 
@@ -99,8 +100,9 @@ const schema = `
         creator: string;
         replies: Reply[];
 
-        constructor (id: string, title: string, description: string, createdAt: string, creator: string) {
+        constructor (id: string, multiSigId: string, title: string, description: string, createdAt: string, creator: string) {
             this.id = id;
+            this.multiSigId = multiSigId;
             this.title = title;
             this.description = description;
             this.createdAt = createdAt;
@@ -270,8 +272,9 @@ export default async function handler(
                 ]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "MultiSigProposals") {
-            const { title, description, creator } = req.body;
+            const { multiSigId, title, description, creator } = req.body;
             if (
+                !body.hasOwnProperty("multiSigId") ||
                 !body.hasOwnProperty("title") ||
                 !body.hasOwnProperty("description") ||
                 !body.hasOwnProperty("creator")
@@ -284,7 +287,14 @@ export default async function handler(
             // Create a record
             const response = await db
                 .collection("MultiSigProposals")
-                .create([id as string, title, description, createdAt, creator]);
+                .create([
+                    id as string,
+                    multiSigId,
+                    title,
+                    description,
+                    createdAt,
+                    creator,
+                ]);
             res.status(200).json({ response: response });
         } else {
             res.status(400).json({ response: "Invalid collection" });
