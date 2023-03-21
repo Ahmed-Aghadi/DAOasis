@@ -37,7 +37,7 @@ export default function Home() {
     };
 
     const modal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"} returnFocus
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"}
                title={"Create Proposal"}
                styles={(theme) => ({
                    content: {

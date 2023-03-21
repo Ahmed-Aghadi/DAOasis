@@ -14,8 +14,9 @@ import SafeAuthContext from "@/contexts/SafeAuthContext";
 import {useContext, useState} from "react";
 import axios from "axios";
 import {showNotification, updateNotification} from "@mantine/notifications";
-import {createSafe} from "@/lib/polybase";
+import {createMultiSigProposal, createSafe} from "@/lib/polybase";
 import PolybaseContext, {MultiSig} from "@/contexts/PolybaseContext";
+import {useRouter} from "next/router";
 
 const style = (theme: any) => ({
     input: {
@@ -35,10 +36,10 @@ const style = (theme: any) => ({
     }
 })
 
-export default function CreateProposalModal({address}:{address: string}) {
-    const safeContext = useContext(SafeAuthContext);
+export default function CreateProposalModal({address}: { address: string }) {
     const userContext = useContext(PolybaseContext);
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const form = useForm({
         initialValues: {
@@ -46,8 +47,8 @@ export default function CreateProposalModal({address}:{address: string}) {
             description: "",
         },
         validate: {
-            title: (value) => value.trim().length > 0 ? "" : "Title is required",
-            description: (value) => value.trim().length > 0 ? "" : "Description is required",
+            title: (value) => value.trim().length > 0 ? undefined : "Title is required",
+            description: (value) => value.trim().length > 0 ? undefined : "Description is required",
         },
         validateInputOnChange: true,
     });
@@ -65,8 +66,13 @@ export default function CreateProposalModal({address}:{address: string}) {
             autoClose: false,
         });
         try {
-
-
+            const data = await createMultiSigProposal({
+                title: values.title,
+                description: values.description,
+                creator: userContext.user?.id!,
+                multiSigId: address,
+            })
+            const id = data.response.data.id
             updateNotification({
                 id: "create-safe",
                 title: "Proposal created!",
@@ -74,6 +80,9 @@ export default function CreateProposalModal({address}:{address: string}) {
                 autoClose: true,
                 color: "green",
             });
+            setTimeout(() => {
+                router.push(`/proposal?id=${id}`)
+            },1500)
         } catch (e) {
             console.log(e);
             updateNotification({
@@ -97,17 +106,17 @@ export default function CreateProposalModal({address}:{address: string}) {
                 placeholder={"Title of the Proposal"}
                 label="Title"
                 required
-                {...form.getInputProps(`title`)}
                 styles={(theme) => style(theme)}
+                {...form.getInputProps("title")}
             />
             <Textarea
                 placeholder={"Description of the Proposal"}
                 label="Description"
                 required
-                {...form.getInputProps(`description`)}
                 styles={(theme) => style(theme)}
+                {...form.getInputProps("description")}
             />
-            <Button disabled={loading} fullWidth type="submit" mt="md" styles={(theme) => ({
+            <Button type="submit" disabled={loading} fullWidth mt="md" styles={(theme) => ({
                 root: {
                     backgroundColor: theme.colors.violet[6],
                     "&:hover": {

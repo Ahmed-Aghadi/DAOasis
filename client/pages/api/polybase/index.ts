@@ -218,11 +218,15 @@ export default async function handler(
                 "MultiSigProposals"
             );
             await handleGet(req, res, multiSigProposalsCollection);
+        } else if (collection === "Reply") {
+            const replyCollection = await db.collection("Reply");
+            await handleGet(req, res, replyCollection);
         } else {
             res.status(400).json({ response: "Invalid collection" });
         }
         return;
-    } else if (req.method === "POST") {
+    }
+    else if (req.method === "POST") {
         const { id } = body;
         if (!id) {
             res.status(400).json({ response: "Missing required field 'id'" });
@@ -233,7 +237,8 @@ export default async function handler(
             // Create a record
             const response = await db.collection("User").create([id as string]);
             res.status(200).json({ response: response });
-        } else if (req.body.collection === "Posts") {
+        }
+        else if (req.body.collection === "Posts") {
             const { userAddress, body: description } = req.body;
             if (
                 !body.hasOwnProperty("userAddress") ||
@@ -247,7 +252,8 @@ export default async function handler(
                 .collection("Posts")
                 .create([id as string, userAddress, description]);
             res.status(200).json({ response: response });
-        } else if (req.body.collection === "MultiSig") {
+        }
+        else if (req.body.collection === "MultiSig") {
             const { owners, name, description, threshold, chainId } = req.body;
             if (
                 !body.hasOwnProperty("owners") ||
@@ -271,10 +277,10 @@ export default async function handler(
                     chainId,
                 ]);
             res.status(200).json({ response: response });
-        } else if (req.body.collection === "MultiSigProposals") {
-            const { multiSigId, title, description, creator } = req.body;
+        }
+        else if (req.body.collection === "MultiSigProposals") {
+            const { title, description, creator } = req.body;
             if (
-                !body.hasOwnProperty("multiSigId") ||
                 !body.hasOwnProperty("title") ||
                 !body.hasOwnProperty("description") ||
                 !body.hasOwnProperty("creator")
@@ -282,20 +288,21 @@ export default async function handler(
                 res.status(400).json({ response: "Missing required fields" });
                 return;
             }
-            const id = uuidv4();
+            const proposalId = uuidv4();
             const createdAt = Date.now();
             // Create a record
             const response = await db
                 .collection("MultiSigProposals")
                 .create([
-                    id as string,
-                    multiSigId,
+                    proposalId as string,
+                    id,
                     title,
                     description,
-                    createdAt,
+                    createdAt.toString(),
                     creator,
                 ]);
             res.status(200).json({ response: response });
+            return;
         } else {
             res.status(400).json({ response: "Invalid collection" });
             return;
@@ -321,7 +328,8 @@ export default async function handler(
                 .call("updateRecord", [name, description]);
             res.status(200).json({ response: recordData });
             return;
-        } else if (req.body.collection === "Posts") {
+        }
+        else if (req.body.collection === "Posts") {
             const { media, mediaType } = body;
             if (
                 !body.hasOwnProperty("media") ||
@@ -336,7 +344,8 @@ export default async function handler(
                 .call("updateRecord", [media, mediaType]);
             res.status(200).json({ response: recordData });
             return;
-        } else if (req.body.collection === "MultiSig") {
+        }
+        else if (req.body.collection === "MultiSig") {
             const { name, description, owners, threshold } = req.body;
             if (body.hasOwnProperty("threshold")) {
                 const recordData = await db
@@ -367,7 +376,8 @@ export default async function handler(
                 .call("updateRecord", [name, description]);
             res.status(200).json({ response: recordData });
             return;
-        } else if (req.body.collection === "MultiSigProposals") {
+        }
+        else if (req.body.collection === "MultiSigProposals") {
             const { transactionHash, description, creator } = req.body;
             if (body.hasOwnProperty("transactionHash")) {
                 const recordData = await db
@@ -388,7 +398,7 @@ export default async function handler(
             const createdAt = Date.now(); // or (new Date()).getTime()
             const replyRecordData = await db
                 .collection("Reply")
-                .create([replyId as string, description, createdAt, creator]);
+                .create([replyId as string, description, createdAt.toString(), creator]);
 
             const recordData = await db
                 .collection("MultiSigProposals")
