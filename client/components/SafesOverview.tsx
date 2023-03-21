@@ -30,7 +30,23 @@ export default function SafesOverview() {
     };
 
     const modal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered>
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"} returnFocus
+               title={"Create Safe"}
+               styles={(theme) => ({
+                   content: {
+                       backgroundColor: theme.colors.blueTheme[2]
+                   },
+                   title: {
+                       fontFamily: "Inter",
+                       fontWeight: 600,
+                       fontSize: "1.2rem",
+                       color: theme.colors.violet[6]
+                   },
+                   header: {
+                       backgroundColor: theme.colors.blueTheme[2],
+                       color: theme.colors.violet[6]
+                   }
+               })}>
             <CreateSafeForm/>
         </Modal>
     );

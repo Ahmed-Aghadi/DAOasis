@@ -17,6 +17,24 @@ import {showNotification, updateNotification} from "@mantine/notifications";
 import {createSafe} from "@/lib/polybase";
 import PolybaseContext, {MultiSig} from "@/contexts/PolybaseContext";
 
+const style = (theme: any) => ({
+    input: {
+        backgroundColor: theme.colors.blueTheme[3],
+        borderRadius: "0.5rem",
+        color: theme.colors.blueTheme[5],
+        borderColor: theme.colors.blueTheme[3],
+        "&:focus": {
+            borderColor: "#3304ba",
+        },
+        "&::placeholder": {
+            color: theme.colors.blueTheme[5],
+        }
+    },
+    label: {
+        color: theme.colors.blueTheme[4],
+    }
+})
+
 export default function CreateProposalModal({address}:{address: string}) {
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
@@ -26,8 +44,8 @@ export default function CreateProposalModal({address}:{address: string}) {
             description: "",
         },
         validate: {
-            title: (value) => value.trim().length > 0 ? "Title is required" : "",
-            description: (value) => value.trim().length > 0 ? "Description is required" : "",
+            title: (value) => value.trim().length > 0 ? "" : "Title is required",
+            description: (value) => value.trim().length > 0 ? "" : "Description is required",
         },
         validateInputOnChange: true,
     });
@@ -71,23 +89,30 @@ export default function CreateProposalModal({address}:{address: string}) {
                 async (values) => await handleFormSubmit(values)
             )}
         >
-            <Text size={"xl"} weight={"bold"}>
-                Create Proposal
-            </Text>
             <TextInput
                 placeholder={"Title of the Proposal"}
                 label="Title"
                 required
                 {...form.getInputProps(`title`)}
+                styles={(theme) => style(theme)}
             />
             <Textarea
                 placeholder={"Description of the Proposal"}
                 label="Description"
                 required
                 {...form.getInputProps(`description`)}
+                styles={(theme) => style(theme)}
             />
-            <Button fullWidth type="submit" color="red" mt="md">
-                Create Safe
+            <Button fullWidth type="submit" mt="md" styles={(theme) => ({
+                root: {
+                    backgroundColor: theme.colors.violet[6],
+                    "&:hover": {
+                        backgroundColor: `${theme.colors.violet[4]} !important`,
+                        color: `${theme.colors.blueTheme[1]} !important`,
+                    },
+                }
+            })}>
+                Create Proposal
             </Button>
         </form>
     );

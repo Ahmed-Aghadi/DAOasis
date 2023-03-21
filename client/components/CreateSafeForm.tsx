@@ -17,6 +17,24 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import { createSafe } from "@/lib/polybase";
 import PolybaseContext, { MultiSig } from "@/contexts/PolybaseContext";
 
+const style = (theme: any) => ({
+    input: {
+        backgroundColor: theme.colors.blueTheme[3],
+        borderRadius: "0.5rem",
+        color: theme.colors.blueTheme[5],
+        borderColor: theme.colors.blueTheme[3],
+        "&:focus": {
+            borderColor: "#3304ba",
+        },
+        "&::placeholder": {
+            color: theme.colors.blueTheme[5],
+        }
+    },
+    label: {
+        color: theme.colors.blueTheme[4],
+    }
+})
+
 export default function CreateSafeForm() {
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
@@ -102,20 +120,19 @@ export default function CreateSafeForm() {
                 async (values) => await handleFormSubmit(values)
             )}
         >
-            <Text size={"xl"} weight={"bold"}>
-                Create Safe
-            </Text>
             <TextInput
                 placeholder={"Name of the Safe"}
                 label="Name"
                 required
                 {...form.getInputProps(`name`)}
+                styles={(theme) => style(theme)}
             />
             <Textarea
                 placeholder={"Description of the Safe"}
                 label="Description"
                 required
                 {...form.getInputProps(`description`)}
+                styles={(theme) => style(theme)}
             />
             <NumberInput
                 min={1}
@@ -125,6 +142,7 @@ export default function CreateSafeForm() {
                 label="Threshold"
                 required
                 {...form.getInputProps(`threshold`)}
+                styles={(theme) => style(theme)}
             />
             {form.values.owners.map((owner, index) => {
                 return (
@@ -136,6 +154,7 @@ export default function CreateSafeForm() {
                                 {...form.getInputProps(
                                     `owners.${index}.address`
                                 )}
+                                styles={(theme) => style(theme)}
                             />
                         </Grid.Col>
                         <Grid.Col
@@ -147,7 +166,7 @@ export default function CreateSafeForm() {
                             }}
                         >
                             <ActionIcon
-                                color={"red"}
+                                color={"grape"}
                                 variant={"subtle"}
                                 onClick={() => {
                                     form.removeListItem(`owners`, index);
@@ -163,11 +182,28 @@ export default function CreateSafeForm() {
                 onClick={() => {
                     form.insertListItem(`owners`, { address: "" });
                 }}
+                styles={(theme) => ({
+                    root: {
+                        backgroundColor: theme.colors.pink[5],
+                        "&:hover": {
+                            backgroundColor: `${theme.colors.blueTheme[5]} !important`,
+                            color: `${theme.colors.blueTheme[0]} !important`,
+                        },
+                    }
+                })}
             >
                 Add owner
             </Button>
             <br />
-            <Button fullWidth type="submit" color="red" mt="md">
+            <Button fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
+                root: {
+                    backgroundColor: theme.colors.violet[6],
+                    "&:hover": {
+                        backgroundColor: `${theme.colors.violet[4]} !important`,
+                        color: `${theme.colors.blueTheme[1]} !important`,
+                    },
+                }
+            })}>
                 Create Safe
             </Button>
         </form>

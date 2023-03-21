@@ -24,15 +24,21 @@ const useStyles = createStyles((theme) => ({
         padding: "0 !important",
     },
 
+    tr: {
+        color: theme.colors.blueTheme[1],
+        "&:hover": {
+            backgroundColor: theme.colors.blueTheme[2],
+            color: theme.colors.blueTheme[0]
+        },
+    },
+
     control: {
         width: "100%",
         padding: `${theme.spacing.xs} ${theme.spacing.md}`,
-
+        color: theme.colors.blueTheme[1],
         "&:hover": {
-            backgroundColor:
-                theme.colorScheme === "dark"
-                    ? theme.colors.dark[6]
-                    : theme.colors.gray[0],
+            backgroundColor: theme.colors.blueTheme[2],
+            color: theme.colors.blueTheme[0]
         },
     },
 
@@ -122,6 +128,7 @@ function sortData(
 }
 
 export function OwnersDetails({ data }: TableSortProps) {
+    const { classes } = useStyles();
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
     const [sortBy, setSortBy] = useState<keyof Omit<RowData, "exists"> | null>(
@@ -149,7 +156,7 @@ export function OwnersDetails({ data }: TableSortProps) {
     };
 
     const rows = sortedData.map((row) => (
-        <tr key={row.id}>
+        <tr className={classes.tr} key={row.id}>
             <td>{row.exists ? row.name : "-"}</td>
             <td>{row.id}</td>
         </tr>
@@ -161,19 +168,26 @@ export function OwnersDetails({ data }: TableSortProps) {
                 <TextInput
                     placeholder="Search by any field"
                     mb="md"
-                    icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                    icon={<IconSearch size="0.9rem" stroke={1.5} color={"#3304ba"} />}
                     value={search}
                     onChange={handleSearchChange}
+                    styles={{
+                        input: {
+                            backgroundColor: "#eeebf7",
+                            borderRadius: "0.5rem",
+                            color: "#3304ba",
+                            "&:focus": {
+                                borderColor: "#3304ba",
+                            },
+                            "&::placeholder": {
+                                color: "#3304ba",
+                            }
+                        },
+                    }}
                 />
                 <Table
                     horizontalSpacing="md"
                     verticalSpacing="xs"
-                    // miw={700}
-                    // sx={{ tableLayout: "fixed" }}
-                    // striped
-                    highlightOnHover
-                    // withBorder
-                    // withColumnBorders
                 >
                     <thead>
                         <tr>
@@ -181,6 +195,7 @@ export function OwnersDetails({ data }: TableSortProps) {
                                 sorted={sortBy === "name"}
                                 reversed={reverseSortDirection}
                                 onSort={() => setSorting("name")}
+
                             >
                                 Name
                             </Th>
@@ -199,7 +214,7 @@ export function OwnersDetails({ data }: TableSortProps) {
                         ) : (
                             <tr>
                                 <td colSpan={Object.keys(data[0]).length}>
-                                    <Text weight={500} align="center">
+                                    <Text weight={500} align="center" sx={{color: "#3304ba"}}>
                                         Nothing found
                                     </Text>
                                 </td>
