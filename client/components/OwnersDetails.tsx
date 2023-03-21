@@ -9,6 +9,7 @@ import {
     Center,
     TextInput,
     rem,
+    Paper,
 } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import {
@@ -155,56 +156,58 @@ export function OwnersDetails({ data }: TableSortProps) {
     ));
 
     return (
-        <ScrollArea>
-            <TextInput
-                placeholder="Search by any field"
-                mb="md"
-                icon={<IconSearch size="0.9rem" stroke={1.5} />}
-                value={search}
-                onChange={handleSearchChange}
-            />
-            <Table
-                horizontalSpacing="md"
-                verticalSpacing="xs"
-                // miw={700}
-                // sx={{ tableLayout: "fixed" }}
-                // striped
-                highlightOnHover
-                withBorder
-                withColumnBorders
-            >
-                <thead>
-                    <tr>
-                        <Th
-                            sorted={sortBy === "name"}
-                            reversed={reverseSortDirection}
-                            onSort={() => setSorting("name")}
-                        >
-                            Name
-                        </Th>
-                        <Th
-                            sorted={sortBy === "id"}
-                            reversed={reverseSortDirection}
-                            onSort={() => setSorting("id")}
-                        >
-                            Address
-                        </Th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.length > 0 ? (
-                        rows
-                    ) : (
+        <Paper p="xl" bg="#c4b7eb">
+            <ScrollArea h={360}>
+                <TextInput
+                    placeholder="Search by any field"
+                    mb="md"
+                    icon={<IconSearch size="0.9rem" stroke={1.5} />}
+                    value={search}
+                    onChange={handleSearchChange}
+                />
+                <Table
+                    horizontalSpacing="md"
+                    verticalSpacing="xs"
+                    // miw={700}
+                    // sx={{ tableLayout: "fixed" }}
+                    // striped
+                    highlightOnHover
+                    // withBorder
+                    // withColumnBorders
+                >
+                    <thead>
                         <tr>
-                            <td colSpan={Object.keys(data[0]).length}>
-                                <Text weight={500} align="center">
-                                    Nothing found
-                                </Text>
-                            </td>
+                            <Th
+                                sorted={sortBy === "name"}
+                                reversed={reverseSortDirection}
+                                onSort={() => setSorting("name")}
+                            >
+                                Name
+                            </Th>
+                            <Th
+                                sorted={sortBy === "id"}
+                                reversed={reverseSortDirection}
+                                onSort={() => setSorting("id")}
+                            >
+                                Address
+                            </Th>
                         </tr>
-                    )}
-                </tbody>
-            </Table>
-        </ScrollArea>
+                    </thead>
+                    <tbody>
+                        {rows.length > 0 ? (
+                            rows
+                        ) : (
+                            <tr>
+                                <td colSpan={Object.keys(data[0]).length}>
+                                    <Text weight={500} align="center">
+                                        Nothing found
+                                    </Text>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+            </ScrollArea>
+        </Paper>
     );
 }
