@@ -8,6 +8,8 @@ import {
 } from "@polybase/client";
 import { ethPersonalSign } from "@polybase/eth";
 import { ethers } from "ethers";
+import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 type Data = {
     response: CollectionList<any> | CollectionRecordResponse<any> | string;
@@ -106,7 +108,8 @@ const schema = `
             this.replies = [];
         }
 
-        function updateTransactionHash (transactionHash: string) {
+        function addTransactionHash (transactionHash: string) {
+        function addTransactionHash (transactionHash: string) {
             this.transactionHash = transactionHash;
         }
 
@@ -121,11 +124,13 @@ const schema = `
         id: string;
         description: string;
         createdAt: string;
+        creator: string;
 
-        constructor (id: string, description: string, createdAt: string) {
+        constructor (id: string, description: string, createdAt: string, creator: string) {
             this.id = id;
             this.description = description;
             this.createdAt = createdAt;
+            this.creator = creator;
         }
     }
 `;
@@ -266,20 +271,21 @@ export default async function handler(
                 ]);
             res.status(200).json({ response: response });
         } else if (req.body.collection === "MultiSigProposals") {
-            const { proposalHash, name, description, image } = req.body;
+            const { name, description } = req.body;
             if (
-                !body.hasOwnProperty("proposalHash") ||
                 !body.hasOwnProperty("name") ||
-                !body.hasOwnProperty("description") ||
-                !body.hasOwnProperty("image")
+                !body.hasOwnProperty("description")
             ) {
                 res.status(400).json({ response: "Missing required fields" });
                 return;
             }
+            const id = uuidv4();
+            const createdAt = Date.now();
             // Create a record
             const response = await db
                 .collection("MultiSigProposals")
-                .create([id as string, proposalHash, name, description, image]);
+                .create([id as string, name, description, createdAt]);
+                .create([id as string, name, description, createdAt]);
             res.status(200).json({ response: response });
         } else {
             res.status(400).json({ response: "Invalid collection" });
@@ -353,15 +359,39 @@ export default async function handler(
             res.status(200).json({ response: recordData });
             return;
         } else if (req.body.collection === "MultiSigProposals") {
-            const { name, description, image } = req.body;
-            if (!name || !description || !image) {
+            const { transactionHash, description, creator } = req.body;
+            if (body.hasOwnProperty("transactionHash")) {
+                const recordData = await db
+                    .collection("MultiSigProposals")
+                    .record(id as string)
+                    .call("addTransactionHash", [transactionHash]);
+                res.status(200).json({ response: recordData });
+                return;
+            }
+            if (
+                !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("creator")
+            ) {
                 res.status(400).json({ response: "Missing required fields" });
                 return;
             }
+            const replyId = uuidv4();
+            const createdAt = Date.now(); // or (new Date()).getTime()
+            const replyRecordData = await db
+                .collection("Reply")
+                .create([replyId as string, description, createdAt, creator]);
+
             const recordData = await db
                 .collection("MultiSigProposals")
                 .record(id as string)
-                .call("updateRecord", [name, description, image]);
+                .call("addReply", [
+                    await db.collection("Reply").record(replyId as string),
+                ]);
+
+                .call("addReply", [
+                    await db.collection("Reply").record(replyId as string),
+                ]);
+
             res.status(200).json({ response: recordData });
             return;
         } else {
