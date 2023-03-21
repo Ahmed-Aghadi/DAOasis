@@ -5,24 +5,23 @@ import {
     Avatar,
     Button,
     CopyButton,
-    Flex,
-    Group, Modal,
+    Group,
+    Modal,
     Paper,
-    ScrollArea, Table,
+    ScrollArea,
+    Table,
     Text,
     Title,
     Tooltip
 } from "@mantine/core";
 import makeBlockie from "ethereum-blockies-base64";
-import {IconCheck, IconCopy, IconExternalLink} from "@tabler/icons-react";
-import SafeAuthContext from "@/contexts/SafeAuthContext";
+import {IconCopy} from "@tabler/icons-react";
 import Link from "next/link";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import PolybaseContext from "@/contexts/PolybaseContext";
 
 export default function SafesOverview() {
     const [loading, setLoading] = useState(true);
-    const safeContext = useContext(SafeAuthContext);
     const polybaseContext = useContext(PolybaseContext);
     const [modalOpened, setModalOpened] = useState(false);
 
@@ -31,13 +30,13 @@ export default function SafesOverview() {
     };
 
     const modal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)}>
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered>
             <CreateSafeForm/>
         </Modal>
     );
 
     useEffect(() => {
-        if(!polybaseContext.multiSigs) return;
+        if (!polybaseContext.multiSigs) return;
         setLoading(false)
     }, [polybaseContext.multiSigs])
 
@@ -46,9 +45,9 @@ export default function SafesOverview() {
             <Paper p="xl" bg="#c4b7eb">
                 <Group position={"apart"} mx={"md"} my={"xs"} p={"xs"}>
                     <Title size={"large"} fw={500} color="white">Your Safes</Title>
-                    <Text underline={true} onClick={open} color={"blue"} style={{cursor: "pointer"}}>
+                    <Button variant="light" compact onClick={open} color={"#3304ba"}>
                         Create a new Safe
-                    </Text>
+                    </Button>
                 </Group>
                 <ScrollArea h={235}>
                     <Table ml={"md"} p={"sm"}>
@@ -58,7 +57,10 @@ export default function SafesOverview() {
                                     <td>
                                         <Group spacing="xs">
                                             <Avatar src={makeBlockie(safe.id)} size="lg" radius="xl"/>
-                                            <Text color="white">{safe.name}</Text>
+                                            <Link href={`/safe?address=${safe.id}`}
+                                                  style={{cursor: "pointer", color: "white", fontSize: "1rem"}}>
+                                                {safe.name}
+                                            </Link>
                                         </Group>
                                     </td>
                                     <td>

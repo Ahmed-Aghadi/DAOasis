@@ -1,38 +1,20 @@
-import { Layout } from "@/components/Layout";
-import { useContext, useEffect, useState } from "react";
+import {Layout} from "@/components/Layout";
+import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
-import {
-    Badge,
-    Button,
-    Center,
-    Group,
-    Modal,
-    SimpleGrid,
-    Skeleton,
-    Text,
-} from "@mantine/core";
-import CreateSafeForm from "@/components/CreateSafeForm";
+import {Button, Center, Modal, SimpleGrid,} from "@mantine/core";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
-import { ethers } from "ethers";
-import EthersAdapter from "@safe-global/safe-ethers-lib";
-import Safe from "@safe-global/safe-core-sdk";
-import SafeServiceClient from "@safe-global/safe-service-client";
-import { getTxService } from "@/lib/getTxService";
-import {
-    OperationType,
-    SafeTransactionDataPartial,
-} from "@safe-global/safe-core-sdk-types";
-import { useRouter } from "next/router";
-import { getProfile, getSafe } from "@/lib/polybase";
-import { CustomSkeleton } from "@/components/CustomSkeleton";
-import { useDisclosure } from "@mantine/hooks";
-import { OwnersDetails } from "@/components/OwnersDetails";
+import {ethers} from "ethers";
+import {useRouter} from "next/router";
+import {getProfile, getSafe} from "@/lib/polybase";
+import {CustomSkeleton} from "@/components/CustomSkeleton";
+import {useDisclosure} from "@mantine/hooks";
+import {OwnersDetails} from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
-import { getRpc } from "@/lib/getRpc";
-import { parseAbiToFunction } from "@/lib/abiParse";
-
-const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
+import {getRpc} from "@/lib/getRpc";
+import {parseAbiToFunction} from "@/lib/abiParse";
+import CreateSafeForm from "@/components/CreateSafeForm";
+import CreateProposalModal from "@/components/CreateProposalModal";
 
 export default function Home() {
     const safeContext = useContext(SafeAuthContext);
@@ -47,8 +29,19 @@ export default function Home() {
     const [threshold, setThreshold] = useState(0);
     const [owners, setOwners] = useState<string[]>([]);
     const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
-    const [opened, { open, close }] = useDisclosure(false);
     const [balance, setBalance] = useState("0.00");
+    const [modalOpened, setModalOpened] = useState(false);
+
+    const open = () => {
+        setModalOpened(true);
+    };
+
+    const modal = (
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered>
+            <CreateProposalModal address={safeAddress}/>
+        </Modal>
+    );
+
 
     useEffect(() => {
         if (!router.isReady) return;
@@ -73,7 +66,7 @@ export default function Home() {
                     safe.owners.map(async (owner: `0x${string}`) => {
                         try {
                             const profile = await getProfile(owner);
-                            return { ...profile.response.data, exists: true };
+                            return {...profile.response.data, exists: true};
                         } catch (error) {
                             console.log("ERROR in safe: ", error);
                             return {
@@ -94,11 +87,14 @@ export default function Home() {
                     await provider.getBalance(safeAddress)
                 );
                 setBalance(balance);
+                setLoading(false);
             } catch (error) {
                 console.log("ERROR in safe: ", error);
                 setIsValid(false);
+                setLoading(true)
+                alert("Invalid Safe Address")
+                router.back()
             }
-            setLoading(false);
         })();
     }, [router.isReady]);
 
@@ -110,10 +106,10 @@ export default function Home() {
             <Center>
                 <SimpleGrid
                     cols={2}
-                    sx={{ width: "85%" }}
+                    sx={{width: "85%"}}
                     breakpoints={[
-                        { maxWidth: 1100, cols: 1 },
-                        { maxWidth: 1200, cols: 2 },
+                        {maxWidth: 1100, cols: 1},
+                        {maxWidth: 1200, cols: 2},
                     ]}
                 >
                     <Overview
@@ -130,10 +126,25 @@ export default function Home() {
                         radius="md"
                         height={"100%"}
                     >
-                        {!loading && <OwnersDetails data={ownersDetails} />}
+                        {!loading && <OwnersDetails data={ownersDetails}/>}
                     </CustomSkeleton>
                 </SimpleGrid>
             </Center>
+            <Center my={"md"}>
+                <SimpleGrid
+                    cols={1}
+                    sx={{width: "85%"}}
+                    breakpoints={[
+                        {maxWidth: 1100, cols: 1},
+                        {maxWidth: 1200, cols: 2},
+                    ]}
+                >
+                    <Button onClick={open}>
+                        Create Proposal
+                    </Button>
+                </SimpleGrid>
+            </Center>
+            {modal}
         </Layout>
     );
 }
