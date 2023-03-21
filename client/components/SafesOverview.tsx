@@ -37,11 +37,9 @@ export default function SafesOverview() {
     );
 
     useEffect(() => {
-        setTimeout(() => {
-            setLoading(false)
-            console.log("pc", polybaseContext.multiSigs)
-        }, 2000)
-    }, [])
+        if(!polybaseContext.multiSigs) return;
+        setLoading(false)
+    }, [polybaseContext.multiSigs])
 
     return (
         <CustomSkeleton visible={loading}>

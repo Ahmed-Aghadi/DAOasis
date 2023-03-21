@@ -1,32 +1,33 @@
-import { Layout } from "@/components/Layout";
-import { useContext, useEffect, useState } from "react";
+import {Layout} from "@/components/Layout";
+import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
 import {
     Badge,
     Button,
     Center,
     Group,
-    Modal,
+    Modal, SimpleGrid,
     Skeleton,
     Text,
 } from "@mantine/core";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
-import { ethers } from "ethers";
+import {ethers} from "ethers";
 import EthersAdapter from "@safe-global/safe-ethers-lib";
 import Safe from "@safe-global/safe-core-sdk";
 import SafeServiceClient from "@safe-global/safe-service-client";
-import { getTxService } from "@/lib/getTxService";
+import {getTxService} from "@/lib/getTxService";
 import {
     OperationType,
     SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
-import { useRouter } from "next/router";
-import { getProfile, getSafe } from "@/lib/polybase";
-import { CustomSkeleton } from "@/components/CustomSkeleton";
-import { useDisclosure } from "@mantine/hooks";
-import { OwnersDetails } from "@/components/OwnersDetails";
+import {useRouter} from "next/router";
+import {getProfile, getSafe} from "@/lib/polybase";
+import {CustomSkeleton} from "@/components/CustomSkeleton";
+import {useDisclosure} from "@mantine/hooks";
+import {OwnersDetails} from "@/components/OwnersDetails";
+import Overview from "@/components/Overview";
 
 const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
 
@@ -43,7 +44,8 @@ export default function Home() {
     const [threshold, setThreshold] = useState(0);
     const [owners, setOwners] = useState<string[]>([]);
     const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
-    const [opened, { open, close }] = useDisclosure(false);
+    const [opened, {open, close}] = useDisclosure(false);
+    const [balance, setBalance] = useState("0.00");
 
     useEffect(() => {
         if (!router.isReady) return;
@@ -68,7 +70,7 @@ export default function Home() {
                     safe.owners.map(async (owner: `0x${string}`) => {
                         try {
                             const profile = await getProfile(owner);
-                            return { ...profile.response.data, exists: true };
+                            return {...profile.response.data, exists: true};
                         } catch (error) {
                             console.log("ERROR in safe: ", error);
                             return {
@@ -82,6 +84,15 @@ export default function Home() {
                 );
                 console.log("OWNERS DETAILS: ", ownersDetails);
                 setOwnersDetails(ownersDetails);
+                const provider = new ethers.providers.Web3Provider(safeContext.safeAuth?.getProvider()!)
+                const signer = provider.getSigner()
+                const ethAdapter = new EthersAdapter({
+                    ethers,
+                    signerOrProvider: signer
+                })
+                const safeSdk = await Safe.create({ ethAdapter, safeAddress })
+                const balance = ethers.utils.formatEther(await safeSdk.getBalance())
+                setBalance(balance)
             } catch (error) {
                 console.log("ERROR in safe: ", error);
                 setIsValid(false);
@@ -95,6 +106,15 @@ export default function Home() {
             <Head>
                 <title>Safe</title>
             </Head>
+            <Center>
+                <SimpleGrid cols={2} sx={{width: "85%"}}
+                            breakpoints={[
+                                {maxWidth: 1100, cols: 1},
+                                {maxWidth: 1200, cols: 2},
+                            ]}>
+                    <Overview loading={loading} address={safeAddress} name={name} chainId={chainId} balance={balance} description={description} threshold={threshold} />
+                </SimpleGrid>
+            </Center>
             <CustomSkeleton visible={loading} radius="md" height={"100%"}>
                 <Center>
                     <h1>{name}</h1>
@@ -107,13 +127,13 @@ export default function Home() {
                 <Group position="center">
                     <Badge
                         variant="gradient"
-                        gradient={{ from: "teal", to: "lime", deg: 105 }}
+                        gradient={{from: "teal", to: "lime", deg: 105}}
                     >
                         Chain Id: {chainId}
                     </Badge>
                     <Badge
                         variant="gradient"
-                        gradient={{ from: "teal", to: "blue", deg: 60 }}
+                        gradient={{from: "teal", to: "blue", deg: 60}}
                         sx={{
                             // on hover
                             "&:hover": {
@@ -128,14 +148,14 @@ export default function Home() {
                     </Badge>
                     <Badge
                         variant="gradient"
-                        gradient={{ from: "orange", to: "red" }}
+                        gradient={{from: "orange", to: "red"}}
                     >
                         Threshhold: {threshold}
                     </Badge>
                 </Group>
             </CustomSkeleton>
             <Modal opened={opened} onClose={close} size="auto" title="Owners">
-                <OwnersDetails data={ownersDetails} />
+                <OwnersDetails data={ownersDetails}/>
             </Modal>
         </Layout>
     );

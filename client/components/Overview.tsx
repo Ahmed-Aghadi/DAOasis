@@ -1,6 +1,6 @@
 import {
     ActionIcon,
-    Avatar,
+    Avatar, Badge,
     Button,
     Container,
     CopyButton,
@@ -11,54 +11,44 @@ import {
     Title,
     Tooltip
 } from "@mantine/core";
-import {useContext, useEffect, useState} from "react";
-import SafeAuthContext from "@/contexts/SafeAuthContext";
-import PolybaseContext from "@/contexts/PolybaseContext";
-import {ethers} from "ethers";
 import makeBlockie from "ethereum-blockies-base64";
 import {IconCheck, IconCopy, IconExternalLink} from "@tabler/icons-react";
 import {CustomSkeleton} from "@/components/CustomSkeleton";
 
-export default function Overview() {
-    const [balance, setBalance] = useState("0.00")
-    const [loading, setLoading] = useState(true)
+export type OverviewProps = {
+    loading: boolean
+    address: string
+    name: string
+    chainId: string
+    balance: string
+    description?: string
+    threshold?: number
+}
 
-    const safeContext = useContext(SafeAuthContext);
-    const userContext = useContext(PolybaseContext);
-
-    useEffect(() => {
-        if (!safeContext.safeAuth) return;
-        getBalance()
-    }, [safeContext.safeAuth])
-
-    const getBalance = async () => {
-        const provider = new ethers.providers.Web3Provider(safeContext.safeAuth?.getProvider()!)
-        const signer = provider.getSigner()
-        const balance = ethers.utils.formatEther(await signer.getBalance())
-        console.log("BALANCE: ", balance)
-        setBalance(balance)
-        setLoading(false)
-    }
-
+export default function Overview({loading, address, name, chainId, balance, description, threshold}: OverviewProps) {
     return (
         <CustomSkeleton visible={loading}>
             <Paper p="xl" bg="#c4b7eb">
+                <Group position={"apart"}>
                 <Title ml={"md"} p={"sm"} size={"large"} fw={500} color="white">Overview</Title>
+                    {threshold && <Badge>Threshold: {threshold}</Badge>}
+                </Group>
                 <Group position="apart" mx={"md"} my={"sm"} p={"sm"}>
                     <Group>
-                        <Avatar src={makeBlockie(safeContext.safeAuthSignInResponse?.eoa || "0x00")} size="lg"
+                        <Avatar src={makeBlockie(address || "0x00")} size="lg"
                                 radius="xl"/>
-                        <Text color="white">{userContext.user?.name}</Text>
+                        <Text color="white">{name}</Text>
                     </Group>
                     <Button radius="lg" sx={{
                         backgroundColor: "#3304ba",
                     }}>
-                        <Text>{getChainDetails(safeContext.safeAuthSignInResponse?.chainId!).name}</Text>
+                        <Text>{getChainDetails(chainId).name}</Text>
                     </Button>
                 </Group>
+                {description && <Text ml={"md"} p={"sm"} color="white">{description}</Text>}
                 <Group mx={"md"} my={"sm"} p={"sm"}>
-                    <Text color="white">{safeContext.safeAuthSignInResponse?.eoa}</Text>
-                    <CopyButton value={safeContext.safeAuthSignInResponse?.eoa!} timeout={2000}>
+                    <Text color="white">{address}</Text>
+                    <CopyButton value={address} timeout={2000}>
                         {({copied, copy}) => (
                             <Tooltip label={copied ? 'Copied' : 'Copy'} withArrow position="top">
                                 <ActionIcon color={copied ? 'teal' : 'white'} onClick={copy}>
@@ -69,7 +59,7 @@ export default function Overview() {
                         )}
                     </CopyButton>
                     <ActionIcon component={"a"} target={"_blank"}
-                                href={`${getChainDetails(safeContext.safeAuthSignInResponse?.chainId!).explorer}${safeContext.safeAuthSignInResponse?.eoa}`}>
+                                href={`${getChainDetails(chainId).explorer}${address}`}>
                         <Tooltip label={"View on Explorer"} position="top" withArrow>
                             <IconExternalLink color={"teal"} size="1rem"/>
                         </Tooltip>
@@ -78,7 +68,9 @@ export default function Overview() {
                 <Flex direction="column" mx={"md"} my={"sm"} p={"sm"}>
                     <Text color="#E9ECEF">Balance</Text>
                     <Text
-                        color="white"><span style={{fontWeight: 700}}>{parseFloat(balance).toFixed(2)}</span> {getChainDetails(safeContext.safeAuthSignInResponse?.chainId!).token}</Text>
+                        color="white"><span
+                        style={{fontWeight: 700}}>{parseFloat(balance).toFixed(2)}</span> {getChainDetails(chainId).token}
+                    </Text>
                 </Flex>
             </Paper>
         </CustomSkeleton>

@@ -1,19 +1,33 @@
 import {Layout} from "@/components/Layout";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
-import {Button, Center, Container, Grid, Group, Modal, Paper, SimpleGrid, Skeleton, Title} from "@mantine/core";
-import CreateSafeForm from "@/components/CreateSafeForm";
+import {Center, SimpleGrid} from "@mantine/core";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
-import EthersAdapter from "@safe-global/safe-ethers-lib";
 import {ethers} from "ethers";
-import {EtherscanProvider} from "@ethersproject/providers";
-import {intNumberFromHexString} from "@coinbase/wallet-sdk/dist/util";
 import Overview from "@/components/Overview";
-import {CustomSkeleton} from "@/components/CustomSkeleton";
 import SafesOverview from "@/components/SafesOverview";
 
 export default function Dashboard() {
+    const [balance, setBalance] = useState("0.00")
+    const [loading, setLoading] = useState(true)
+
+    const safeContext = useContext(SafeAuthContext);
+    const userContext = useContext(PolybaseContext);
+
+    useEffect(() => {
+        if (!safeContext.safeAuth) return;
+        getBalance()
+    }, [safeContext.safeAuth])
+
+    const getBalance = async () => {
+        const provider = new ethers.providers.Web3Provider(safeContext.safeAuth?.getProvider()!)
+        const signer = provider.getSigner()
+        const balance = ethers.utils.formatEther(await signer.getBalance())
+        console.log("BALANCE: ", balance)
+        setBalance(balance)
+        setLoading(false)
+    }
 
     return (
         <Layout>
@@ -23,19 +37,14 @@ export default function Dashboard() {
             <Center>
                 <SimpleGrid cols={2} sx={{width: "85%"}}
                             breakpoints={[
-                                {maxWidth: 600, cols: 1},
-                                {maxWidth: 900, cols: 2},
+                                {maxWidth: 1100, cols: 1},
+                                {maxWidth: 1200, cols: 2},
                             ]}
                 >
-                    <Overview />
+                    <Overview loading={loading} balance={balance} name={userContext.user?.name!} address={safeContext.safeAuthSignInResponse?.eoa!} chainId={safeContext.safeAuthSignInResponse?.chainId!} />
                     <SafesOverview />
                 </SimpleGrid>
             </Center>
         </Layout>
     );
 }
-// <Title>Dashboard</Title>
-// <Group position="center">
-//     <Button onClick={open}>Create Safe </Button>
-// </Group>
-// {modal}
