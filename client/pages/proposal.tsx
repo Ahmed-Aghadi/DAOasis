@@ -2,7 +2,7 @@ import {Layout} from "@/components/Layout";
 import Head from "next/head";
 import {Anchor, Avatar, Breadcrumbs, Center, Group, Paper, Tabs, Text, Title} from "@mantine/core";
 import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getMultiSigProposal} from "@/lib/polybase";
 import {StyledTabs} from "@/components/StyledTabs";
 import ViewReply from "@/components/ViewReply";
@@ -62,6 +62,13 @@ export default function Home() {
                         proposalData?.replies.map(reply => (
                             <ViewReply collectionId={reply.collectionId} id={reply.id} />
                         ))
+                    }
+                    {
+                        proposalData?.replies.length === 0 && (
+                            <Paper my="md" p='md' bg="#c4b7eb" radius="lg">
+                                <Text color="white" size="lg">No conversations here yet. Be the first to chat!</Text>
+                            </Paper>
+                        )
                     }
                 </Tabs.Panel>
             </StyledTabs>
