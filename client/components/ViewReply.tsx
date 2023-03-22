@@ -22,16 +22,16 @@ export default function ViewReply({collectionId, id}: { collectionId: string, id
     console.log("replyData", replyData)
 
     return (
-        <Paper my="md" p='md' bg="#c4b7eb" radius="lg">
+        <Paper my="md" p='md' bg="#e1dbf5" radius="lg">
             <Group position="apart" mb="md">
                 <Group>
                     <Avatar component="a" href={`/user?address=${replyData?.creator}`} src={makeBlockie(replyData?.creator || "0x00")} size="sm"
                             radius="xl"/>
-                    <Text component="a" href={`/user?address=${replyData?.creator}`} color="white" size="xs">{replyData?.creator}</Text>
+                    <Text component="a" href={`/user?address=${replyData?.creator}`} color="#E599F7" size="xs">{replyData?.creator}</Text>
                 </Group>
-                <Text size="sm" color="white">{time}</Text>
+                <Text size="sm" color="#E599F7">{time}</Text>
             </Group>
-            <Text color="white" size="lg">{replyData?.description}</Text>
+            <Text color="#CC5DE8" size="lg">{replyData?.description}</Text>
         </Paper>
     )
 }

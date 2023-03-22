@@ -6,6 +6,7 @@ import React, {useEffect, useState} from "react";
 import {getMultiSigProposal} from "@/lib/polybase";
 import {StyledTabs} from "@/components/StyledTabs";
 import ViewReply from "@/components/ViewReply";
+import CreateProposalTxn from "@/components/CreateProposalTxn";
 
 export type ProposalData = {
     createdAt: string;
@@ -37,7 +38,7 @@ export default function Home() {
         {title: `${router.query?.name}`, href: `/safe?address=${proposalData?.multiSigId}`},
         {title: proposalData?.title, href: `/proposal?id=${proposalData?.id}&name=${router.query.name}`},
     ].map((item, index) => (
-        <Anchor href={item.href} key={index}>
+        <Anchor color="#E599F7" href={item.href} key={index}>
             {item.title}
         </Anchor>
     ))
@@ -50,8 +51,8 @@ export default function Home() {
             <Breadcrumbs>
                 {items}
             </Breadcrumbs>
-            <Title>{proposalData?.title}</Title>
-            <Text>{proposalData?.description}</Text>
+            <Title color="#AE3EC9">{proposalData?.title}</Title>
+            <Text color="#CC5DE8">{proposalData?.description}</Text>
             <StyledTabs defaultValue="discussions">
                 <Tabs.List my={"md"}>
                     <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
@@ -65,11 +66,16 @@ export default function Home() {
                     }
                     {
                         proposalData?.replies.length === 0 && (
-                            <Paper my="md" p='md' bg="#c4b7eb" radius="lg">
-                                <Text color="white" size="lg">No conversations here yet. Be the first to chat!</Text>
+                            <Paper my="md" p='md' bg="#e1dbf5" radius="lg">
+                                <Text color="#CC5DE8" size="lg">No conversations here yet. Be the first to chat!</Text>
                             </Paper>
                         )
                     }
+                </Tabs.Panel>
+                <Tabs.Panel value={"proposals"}>
+                    <Paper my="md" p='md' bg="#eeebf7" radius="lg">
+                        <CreateProposalTxn />
+                    </Paper>
                 </Tabs.Panel>
             </StyledTabs>
         </Layout>
