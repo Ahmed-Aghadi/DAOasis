@@ -1,11 +1,11 @@
 import {Layout} from "@/components/Layout";
 import Head from "next/head";
-import {Center, Paper} from "@mantine/core";
+import {Anchor, Avatar, Breadcrumbs, Center, Group, Paper, Text, Title} from "@mantine/core";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import {getMultiSigProposal} from "@/lib/polybase";
 
-interface ProposalData {
+export type ProposalData = {
     createdAt: string;
     description: string;
     id: string;
@@ -28,17 +28,27 @@ export default function Home() {
         })
     }, [router.query])
 
+    console.log("proposalData", proposalData)
+
+    const items = [
+        {title: `${router.query?.name}`, href: `/safe?address=${proposalData?.multiSigId}`},
+        {title: proposalData?.title, href: `/proposal?id=${proposalData?.id}&name=${router.query.name}`},
+    ].map((item, index) => (
+        <Anchor href={item.href} key={index}>
+            {item.title}
+        </Anchor>
+    ))
 
     return (
         <Layout>
             <Head>
                 <title>Create Proposal</title>
             </Head>
-            <Center>
-                <Paper>
-                    Hola
-                </Paper>
-            </Center>
+            <Breadcrumbs>
+                {items}
+            </Breadcrumbs>
+            <Title>{proposalData?.title}</Title>
+            <Text>{proposalData?.description}</Text>
         </Layout>
     )
 }

@@ -6,15 +6,13 @@ import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
 import {ethers} from "ethers";
 import {useRouter} from "next/router";
-import {getProfile, getSafe} from "@/lib/polybase";
+import {getMultiSigProposal, getProfile, getSafe} from "@/lib/polybase";
 import {CustomSkeleton} from "@/components/CustomSkeleton";
-import {useDisclosure} from "@mantine/hooks";
 import {OwnersDetails} from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
 import {getRpc} from "@/lib/getRpc";
-import {parseAbiToFunction} from "@/lib/abiParse";
-import CreateSafeForm from "@/components/CreateSafeForm";
 import CreateProposalModal from "@/components/CreateProposalModal";
+import {ProposalData} from "@/pages/proposal";
 
 export default function Home() {
     const safeContext = useContext(SafeAuthContext);
@@ -31,6 +29,7 @@ export default function Home() {
     const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
     const [balance, setBalance] = useState("0.00");
     const [modalOpened, setModalOpened] = useState(false);
+    const [proposals, setProposals] = useState<ProposalData>()
 
     const open = () => {
         setModalOpened(true);
@@ -55,7 +54,7 @@ export default function Home() {
                    }
                })}
         >
-            <CreateProposalModal address={safeAddress}/>
+            <CreateProposalModal address={safeAddress} name={name}/>
         </Modal>
     );
 
@@ -104,6 +103,9 @@ export default function Home() {
                     await provider.getBalance(safeAddress)
                 );
                 setBalance(balance);
+                const proposals = await getMultiSigProposal(safeAddress);
+                console.log("PROPOSALS: ", proposals);
+                setProposals(proposals.response.data)
                 setLoading(false);
             } catch (error) {
                 console.log("ERROR in safe: ", error);

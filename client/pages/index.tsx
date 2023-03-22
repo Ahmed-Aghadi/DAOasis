@@ -90,7 +90,7 @@ export default function Home() {
     return (
         <>
             <Head>
-                <title>StakeSquadron</title>
+                <title>DAOasis</title>
                 <meta name="description" content="A multi-sig dao" />
                 <meta
                     name="viewport"
