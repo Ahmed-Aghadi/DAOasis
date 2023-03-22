@@ -16,16 +16,16 @@ interface Safe {
 }
 
 interface Proposal {
-    title: string
-    description: string
-    creator: string
-    multiSigId: string
+    title: string;
+    description: string;
+    creator: string;
+    multiSigId: string;
 }
 
 interface ProposalReply {
-    description: string
-    creator: string
-    multiSigProposalId: string
+    description: string;
+    creator: string;
+    multiSigProposalId: string;
 }
 
 export const createProfile = async (profile: Profile) => {
@@ -60,19 +60,24 @@ export const createSafe = async (safe: Safe) => {
     return response.data;
 };
 
-export const createMultiSigProposal = async ({title, description, creator, multiSigId}: Proposal) => {
+export const createMultiSigProposal = async ({
+    title,
+    description,
+    creator,
+    multiSigId,
+}: Proposal) => {
     const response = await axios.post(`/api/polybase`, {
         collection: "MultiSigProposals",
         title,
         description,
         creator,
-        id: multiSigId
+        id: multiSigId,
     });
     if (response.status !== 200) {
         throw new Error("Error creating proposal");
     }
     return response.data;
-}
+};
 
 export const updateProfile = async (profile: Profile) => {
     const { id, name } = profile;
@@ -89,33 +94,37 @@ export const updateProfile = async (profile: Profile) => {
     return response.json();
 };
 
-export const addReply = async ({multiSigProposalId: id, creator, description}: ProposalReply) => {
+export const addReply = async ({
+    multiSigProposalId: id,
+    creator,
+    description,
+}: ProposalReply) => {
     const response = await axios.patch(`/api/polybase`, {
         collection: "MultiSigProposals",
         id,
         creator,
-        description
-    })
+        description,
+    });
     if (response.status !== 200) {
         throw new Error("Error updating proposal");
     }
     return response.data;
-}
+};
 
 export const addTxnHash = async (id: string, transactionHash: string) => {
     const response = await axios.patch(`/api/polybase`, {
         collection: "MultiSigProposals",
         id,
-        transactionHash
-    })
+        transactionHash,
+    });
     if (response.status !== 200) {
         throw new Error("Error updating proposal");
     }
     return response.data;
-}
+};
 
 export const getProfile = async (id: Profile["id"]) => {
-    console.log("id",id)
+    console.log("id", id);
     const response = await axios.get(`/api/polybase`, {
         params: {
             id,
@@ -164,7 +173,20 @@ export const getMultiSigProposal = async (id: string) => {
         throw new Error("Error getting proposal");
     }
     return response.data;
-}
+};
+
+export const getMultiSigProposals = async (multiSigId: string) => {
+    const response = await axios.get(`/api/polybase`, {
+        params: {
+            multiSigId,
+            collection: "MultiSigProposals",
+        },
+    });
+    if (response.status !== 200) {
+        throw new Error("Error getting proposals");
+    }
+    return response.data;
+};
 
 export const getReply = async (id: string) => {
     const response = await axios.get(`/api/polybase`, {
@@ -177,4 +199,4 @@ export const getReply = async (id: string) => {
         throw new Error("Error getting reply");
     }
     return response.data;
-}
+};
