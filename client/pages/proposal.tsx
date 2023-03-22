@@ -5,9 +5,11 @@ import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import {getMultiSigProposal} from "@/lib/polybase";
 import {StyledTabs} from "@/components/StyledTabs";
+import ViewReply from "@/components/ViewReply";
 
 export type ProposalData = {
     createdAt: string;
+    creator: string;
     description: string;
     id: string;
     title: string;
@@ -50,13 +52,18 @@ export default function Home() {
             </Breadcrumbs>
             <Title>{proposalData?.title}</Title>
             <Text>{proposalData?.description}</Text>
-            <StyledTabs>
+            <StyledTabs defaultValue="discussions">
                 <Tabs.List my={"md"}>
-                    <Tabs.Tab value="readme">Readme</Tabs.Tab>
-                    <Tabs.Tab value="versions">Versions</Tabs.Tab>
-                    <Tabs.Tab value="Members">Members</Tabs.Tab>
-                    <Tabs.Tab value={"settings"}>Settings</Tabs.Tab>
+                    <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
+                    <Tabs.Tab value="proposals">Contract Proposal</Tabs.Tab>
                 </Tabs.List>
+                <Tabs.Panel value={"discussions"}>
+                    {
+                        proposalData?.replies.map(reply => (
+                            <ViewReply collectionId={reply.collectionId} id={reply.id} />
+                        ))
+                    }
+                </Tabs.Panel>
             </StyledTabs>
         </Layout>
     )

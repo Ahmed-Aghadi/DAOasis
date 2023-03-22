@@ -6,13 +6,14 @@ import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
 import {ethers} from "ethers";
 import {useRouter} from "next/router";
-import {getMultiSigProposal, getProfile, getSafe} from "@/lib/polybase";
+import {getMultiSigProposal, getMultiSigProposals, getProfile, getSafe} from "@/lib/polybase";
 import {CustomSkeleton} from "@/components/CustomSkeleton";
 import {OwnersDetails} from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
 import {getRpc} from "@/lib/getRpc";
 import CreateProposalModal from "@/components/CreateProposalModal";
 import {ProposalData} from "@/pages/proposal";
+import {ProposalTable} from "@/components/ProposalTable";
 
 export default function Home() {
     const safeContext = useContext(SafeAuthContext);
@@ -29,7 +30,7 @@ export default function Home() {
     const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
     const [balance, setBalance] = useState("0.00");
     const [modalOpened, setModalOpened] = useState(false);
-    const [proposals, setProposals] = useState<ProposalData>()
+    const [proposals, setProposals] = useState<ProposalData[]>()
 
     const open = () => {
         setModalOpened(true);
@@ -103,9 +104,14 @@ export default function Home() {
                     await provider.getBalance(safeAddress)
                 );
                 setBalance(balance);
-                const proposals = await getMultiSigProposal(safeAddress);
-                console.log("PROPOSALS: ", proposals);
-                setProposals(proposals.response.data)
+                let proposals = await getMultiSigProposals(safeAddress);
+                proposals = proposals.response.data.map((proposal: any) => ({
+                    title: proposal.data.title,
+                    creator: proposal.data.creator,
+                    id: proposal.data.id,
+                    createdAt: proposal.data.createdAt,
+                }))
+                setProposals(proposals)
                 setLoading(false);
             } catch (error) {
                 console.log("ERROR in safe: ", error);
@@ -116,6 +122,8 @@ export default function Home() {
             }
         })();
     }, [router.isReady]);
+
+    console.log("PROPOSALS: ", proposals)
 
     return (
         <Layout>
@@ -158,9 +166,13 @@ export default function Home() {
                         {maxWidth: 1200, cols: 2},
                     ]}
                 >
-                    <Button onClick={open}>
-                        Create Proposal
-                    </Button>
+                    <CustomSkeleton
+                        visible={loading}
+                        radius="md"
+                        height={"100%"}
+                    >
+                        {!loading && <ProposalTable data={proposals!} name={name}/>}
+                    </CustomSkeleton>
                 </SimpleGrid>
             </Center>
             {modal}

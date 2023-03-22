@@ -9,19 +9,17 @@ import {
     Transition,
     rem,
     Text,
-    Button,
     Menu,
     UnstyledButton, Avatar, Tooltip,
 } from "@mantine/core";
 import {useClipboard, useDisclosure} from "@mantine/hooks";
-import logo from "@/public/logo-wo-bg.png";
+import logo from "@/public/img.png";
 import Link from "next/link";
 import Image from "next/image";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
 import Logout from "@/components/Logout";
 import {IconChevronDown, IconCopy, IconLogout, IconMessage} from "@tabler/icons-react";
 import PolybaseContext from "@/contexts/PolybaseContext";
-import {IconHeart, IconStar} from "@tabler/icons-react";
 import makeBlockie from "ethereum-blockies-base64";
 import {useRouter} from "next/router";
 import ChainSelect from "@/components/ChainSelect";

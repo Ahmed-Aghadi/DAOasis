@@ -7,7 +7,7 @@ export function parseAbiToFunction(abi: string): any {
                 abi.stateMutability !== "view" &&
                 abi.stateMutability !== "pure"
         );
-        const functionAbiMap = functionAbi.map((abi: any) => {
+        return functionAbi.map((abi: any) => {
             return {
                 name: abi.name,
                 inputs:
@@ -18,7 +18,6 @@ export function parseAbiToFunction(abi: string): any {
                 stateMutability: abi.stateMutability,
             };
         });
-        return functionAbiMap;
     } catch (e) {
         throw new Error("Invalid ABI");
     }
