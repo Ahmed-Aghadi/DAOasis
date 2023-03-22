@@ -1,9 +1,10 @@
 import {Layout} from "@/components/Layout";
 import Head from "next/head";
-import {Anchor, Avatar, Breadcrumbs, Center, Group, Paper, Text, Title} from "@mantine/core";
+import {Anchor, Avatar, Breadcrumbs, Center, Group, Paper, Tabs, Text, Title} from "@mantine/core";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import {getMultiSigProposal} from "@/lib/polybase";
+import {StyledTabs} from "@/components/StyledTabs";
 
 export type ProposalData = {
     createdAt: string;
@@ -49,6 +50,14 @@ export default function Home() {
             </Breadcrumbs>
             <Title>{proposalData?.title}</Title>
             <Text>{proposalData?.description}</Text>
+            <StyledTabs>
+                <Tabs.List my={"md"}>
+                    <Tabs.Tab value="readme">Readme</Tabs.Tab>
+                    <Tabs.Tab value="versions">Versions</Tabs.Tab>
+                    <Tabs.Tab value="Members">Members</Tabs.Tab>
+                    <Tabs.Tab value={"settings"}>Settings</Tabs.Tab>
+                </Tabs.List>
+            </StyledTabs>
         </Layout>
     )
 }
