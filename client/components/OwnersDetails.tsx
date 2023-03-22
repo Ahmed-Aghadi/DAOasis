@@ -9,7 +9,7 @@ import {
     Center,
     TextInput,
     rem,
-    Paper,
+    Paper, Title,
 } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import {
@@ -164,6 +164,7 @@ export function OwnersDetails({ data }: TableSortProps) {
 
     return (
         <Paper p="xl" bg="#c4b7eb">
+            <Title p={"sm"} size={"large"} fw={500} color="white">Safe Owners</Title>
             <ScrollArea h={360}>
                 <TextInput
                     placeholder="Search by any field"
