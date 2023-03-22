@@ -214,7 +214,7 @@ export function OwnersDetails({ data }: TableSortProps) {
                             rows
                         ) : (
                             <tr>
-                                <td colSpan={Object.keys(data[0]).length}>
+                                <td>
                                     <Text weight={500} align="center" sx={{color: "#3304ba"}}>
                                         Nothing found
                                     </Text>

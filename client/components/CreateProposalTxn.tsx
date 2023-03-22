@@ -1,9 +1,13 @@
 import {Title, Text, TextInput, Textarea, Select, Button, Accordion, NumberInput} from "@mantine/core";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {useForm} from "@mantine/form";
 import {ethers} from "ethers";
 import {parseAbiToFunction} from "@/lib/abiParse";
 import StyledAccordion from "@/components/StyledAccordion";
+import safeAuthContext from "@/contexts/SafeAuthContext";
+import {proposeTransaction} from "@/lib/safeTransactions";
+import {useRouter} from "next/router";
+import {addTxnHash} from "@/lib/polybase";
 
 const style = (theme: any) => ({
     input: {
@@ -24,6 +28,10 @@ const style = (theme: any) => ({
 })
 
 export default function CreateProposalTxn() {
+    const safeContext = useContext(safeAuthContext)
+    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+
     let abiFunctions: any[] = []
     const [selectData, setSelectData] = useState<any[]>([]);
     const [selectedFunctionComponent, setSelectedFunctionComponent] = useState<any>(null);
@@ -80,13 +88,33 @@ export default function CreateProposalTxn() {
         const func = abiFunctions[value];
         const functionComponent = func?.inputs?.map((input: any, index: number) => {
             return (
-                <TextInput my="sm" placeholder={input.type} required
+                <TextInput key={index} my="sm" placeholder={input.type} required
                            label={`${input.name} (${input.type})`} {...txnProposalForm.getInputProps(`args.${index}`)}
                            styles={(theme) => style(theme)}/>
             )
         })
         setSelectedFunctionComponent(functionComponent)
         return true
+    }
+
+    const handleProposalSubmit = async (values: any) => {
+        setLoading(true)
+        const func = abiFunctions[values.functionName]
+        console.log(func)
+        let args_ = values.args
+        for(let i = 0; i < values.args.length; i++) {
+            if(func.inputs[i].type.includes("uint")) {
+                args_[i] = parseInt(values.args[i])
+            }
+        }
+        const iFace = new ethers.utils.Interface(JSON.parse(values.abi))
+        const data = iFace.encodeFunctionData(func.name, args_)
+        console.log("data", data)
+        const txHash = await proposeTransaction(safeContext.provider!,router.query.address as string, router.query.chainId as string, values.contractAddress, "0", data)
+        console.log("fds",txHash)
+        const response = await addTxnHash(router.query.id as string, txHash)
+        console.log(response.data)
+        setLoading(false)
     }
 
     return (
@@ -100,7 +128,7 @@ export default function CreateProposalTxn() {
                         <Text color="#CC5DE8">
                             Enter the contract address and the abi.
                         </Text>
-                        <form onSubmit={txnProposalForm.onSubmit(async (values) => console.log(values))}>
+                        <form onSubmit={txnProposalForm.onSubmit(async (values) => handleProposalSubmit(values))}>
                             <TextInput my="sm" placeholder="Enter the contract address" required
                                        label="Enter the contract address you want to interact with" {...txnProposalForm.getInputProps("contractAddress")}
                                        styles={(theme) => style(theme)}/>
@@ -147,7 +175,7 @@ export default function CreateProposalTxn() {
                                     })}/>
                             {selectedFunctionComponent}
                             {selectedFunctionComponent &&
-                                <Button fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
+                                <Button loading={loading} fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
                                     root: {
                                         backgroundColor: theme.colors.violet[6],
                                         "&:hover": {

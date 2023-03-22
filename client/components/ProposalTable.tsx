@@ -9,7 +9,7 @@ import {
     Center,
     TextInput,
     rem,
-    Paper, Title,
+    Paper, Title, Button, Modal,
 } from "@mantine/core";
 import {keys} from "@mantine/utils";
 import {
@@ -19,6 +19,8 @@ import {
     IconSearch,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import CreateProposalModal from "@/components/CreateProposalModal";
+import {router} from "next/client";
 
 const useStyles = createStyles((theme) => ({
     th: {
@@ -60,6 +62,8 @@ interface RowData {
 interface TableSortProps {
     data: RowData[];
     name: string;
+    safeAddress: string;
+    chainId: string;
 }
 
 interface ThProps {
@@ -130,14 +134,42 @@ function sortData(
     );
 }
 
-export function ProposalTable({data, name}: TableSortProps) {
+export function ProposalTable({data, name, safeAddress, chainId}: TableSortProps) {
     const {classes} = useStyles();
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
+    const [modalOpened, setModalOpened] = useState(false);
     const [sortBy, setSortBy] = useState<keyof RowData | null>(
         null
     );
     const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+    const open = () => {
+        setModalOpened(true);
+    };
+
+    const modal = (
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"}
+               title={"Create Proposal"}
+               styles={(theme) => ({
+                   content: {
+                       backgroundColor: theme.colors.blueTheme[2]
+                   },
+                   title: {
+                       fontFamily: "Inter",
+                       fontWeight: 600,
+                       fontSize: "1.2rem",
+                       color: theme.colors.violet[6]
+                   },
+                   header: {
+                       backgroundColor: theme.colors.blueTheme[2],
+                       color: theme.colors.violet[6]
+                   }
+               })}
+        >
+            <CreateProposalModal chainId={chainId} address={router.query?.address! as string} name={name}/>
+        </Modal>
+    );
 
     const setSorting = (field: keyof RowData) => {
         const reversed = field === sortBy ? !reverseSortDirection : false;
@@ -161,17 +193,17 @@ export function ProposalTable({data, name}: TableSortProps) {
     const rows = sortedData.map((row) => (
         <tr className={classes.tr} key={row.id}>
             <td>
-                <Link href={`/proposal?id=${row.id}&name=${name}`}>
+                <Link href={`/proposal?id=${row.id}&name=${name}&address=${safeAddress}&chainId=${chainId}`}>
                     {row.title}
                 </Link>
             </td>
             <td>
-                <Link href={`/proposal?id=${row.id}&name=${name}`}>
+                <Link href={`/proposal?id=${row.id}&name=${name}&address=${safeAddress}&chainId=${chainId}`}>
                     {row.creator}
                 </Link>
             </td>
             <td>
-                <Link href={`/proposal?id=${row.id}&name=${name}`}>
+                <Link href={`/proposal?id=${row.id}&name=${name}&address=${safeAddress}&chainId=${chainId}`}>
                     {new Date(parseInt(row.createdAt)).toLocaleDateString()}
                 </Link>
             </td>
@@ -180,7 +212,12 @@ export function ProposalTable({data, name}: TableSortProps) {
 
     return (
         <Paper p="xl" bg="#c4b7eb">
-            <Title p={"sm"} size={"large"} fw={500} color="white">Safe Proposals</Title>
+            <Group position={"apart"} mx={"md"} my={"xs"} p={"xs"}>
+                <Title size={"large"} fw={500} color="white">Safe Proposals</Title>
+                <Button variant="light" compact onClick={open} color={"#3304ba"}>
+                    Create a new proposal
+                </Button>
+            </Group>
             <ScrollArea h={360}>
                 <TextInput
                     placeholder="Search by any field"
@@ -237,8 +274,8 @@ export function ProposalTable({data, name}: TableSortProps) {
                         rows
                     ) : (
                         <tr>
-                            <td colSpan={Object.keys(data[0]).length}>
-                                <Text weight={500} align="center" sx={{color: "#3304ba"}}>
+                            <td>
+                                <Text weight={500} align="left" sx={{color: "#3304ba"}}>
                                     Nothing found
                                 </Text>
                             </td>
@@ -247,6 +284,7 @@ export function ProposalTable({data, name}: TableSortProps) {
                     </tbody>
                 </Table>
             </ScrollArea>
+            {modal}
         </Paper>
     );
 }

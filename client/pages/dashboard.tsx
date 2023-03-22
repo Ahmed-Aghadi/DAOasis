@@ -37,8 +37,7 @@ export default function Dashboard() {
             <Center>
                 <SimpleGrid cols={2} sx={{width: "85%"}}
                             breakpoints={[
-                                {maxWidth: 1100, cols: 1},
-                                {maxWidth: 1200, cols: 2},
+                                {maxWidth: 1200, cols: 1},
                             ]}
                 >
                     <Overview loading={loading} balance={balance} name={userContext.user?.name!} address={safeContext.safeAuthSignInResponse?.eoa!} chainId={safeContext.safeAuthSignInResponse?.chainId!} />

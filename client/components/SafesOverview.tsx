@@ -58,7 +58,7 @@ export default function SafesOverview() {
 
     return (
         <CustomSkeleton visible={loading}>
-            <Paper p="xl" bg="#c4b7eb">
+            <Paper p="xl" bg="#c4b7eb" sx={{height: "100%"}}>
                 <Group position={"apart"} mx={"md"} my={"xs"} p={"xs"}>
                     <Title size={"large"} fw={500} color="white">Your Safes</Title>
                     <Button variant="light" compact onClick={open} color={"#3304ba"}>

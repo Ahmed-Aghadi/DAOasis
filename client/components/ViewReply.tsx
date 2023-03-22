@@ -19,8 +19,6 @@ export default function ViewReply({collectionId, id}: { collectionId: string, id
         })
     }, [id])
 
-    console.log("replyData", replyData)
-
     return (
         <Paper my="md" p='md' bg="#e1dbf5" radius="lg">
             <Group position="apart" mb="md">

@@ -18,7 +18,8 @@ export type ProposalData = {
     replies: {
         collectionId: string;
         id: string;
-    }[]
+    }[],
+    transactionHash: string;
 }
 
 export default function Home() {
@@ -60,8 +61,8 @@ export default function Home() {
                 </Tabs.List>
                 <Tabs.Panel value={"discussions"}>
                     {
-                        proposalData?.replies.map(reply => (
-                            <ViewReply collectionId={reply.collectionId} id={reply.id} />
+                        proposalData?.replies.map((reply, index) => (
+                            <ViewReply key={index} collectionId={reply.collectionId} id={reply.id} />
                         ))
                     }
                     {
@@ -74,7 +75,12 @@ export default function Home() {
                 </Tabs.Panel>
                 <Tabs.Panel value={"proposals"}>
                     <Paper my="md" p='md' bg="#eeebf7" radius="lg">
-                        <CreateProposalTxn />
+                        {!proposalData?.transactionHash && <CreateProposalTxn/>}
+                        {proposalData?.transactionHash && (
+                            <Group spacing="md">
+                                <Text color="#CC5DE8" size="lg">Transaction Hash: {proposalData.transactionHash}</Text>
+                            </Group>
+                        )}
                     </Paper>
                 </Tabs.Panel>
             </StyledTabs>

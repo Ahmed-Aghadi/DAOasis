@@ -11,7 +11,6 @@ import {CustomSkeleton} from "@/components/CustomSkeleton";
 import {OwnersDetails} from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
 import {getRpc} from "@/lib/getRpc";
-import CreateProposalModal from "@/components/CreateProposalModal";
 import {ProposalData} from "@/pages/proposal";
 import {ProposalTable} from "@/components/ProposalTable";
 
@@ -29,35 +28,7 @@ export default function Home() {
     const [owners, setOwners] = useState<string[]>([]);
     const [ownersDetails, setOwnersDetails] = useState<any[]>([]);
     const [balance, setBalance] = useState("0.00");
-    const [modalOpened, setModalOpened] = useState(false);
     const [proposals, setProposals] = useState<ProposalData[]>()
-
-    const open = () => {
-        setModalOpened(true);
-    };
-
-    const modal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"}
-               title={"Create Proposal"}
-               styles={(theme) => ({
-                   content: {
-                       backgroundColor: theme.colors.blueTheme[2]
-                   },
-                   title: {
-                       fontFamily: "Inter",
-                       fontWeight: 600,
-                       fontSize: "1.2rem",
-                       color: theme.colors.violet[6]
-                   },
-                   header: {
-                       backgroundColor: theme.colors.blueTheme[2],
-                       color: theme.colors.violet[6]
-                   }
-               })}
-        >
-            <CreateProposalModal address={safeAddress} name={name}/>
-        </Modal>
-    );
 
 
     useEffect(() => {
@@ -71,9 +42,7 @@ export default function Home() {
             try {
                 const response = await getSafe(safeAddress);
                 setIsValid(true);
-                console.log("RESPONSE in safe: ", response);
                 const safe = response.response.data;
-                console.log("SAFE: ", safe);
                 setName(safe.name);
                 setDescription(safe.description);
                 setChainId(safe.chainId);
@@ -95,7 +64,6 @@ export default function Home() {
                         }
                     })
                 );
-                console.log("OWNERS DETAILS: ", ownersDetails);
                 setOwnersDetails(ownersDetails);
                 const provider = ethers.getDefaultProvider(
                     getRpc(safe.chainId)
@@ -123,8 +91,6 @@ export default function Home() {
         })();
     }, [router.isReady]);
 
-    console.log("PROPOSALS: ", proposals)
-
     return (
         <Layout>
             <Head>
@@ -135,8 +101,7 @@ export default function Home() {
                     cols={2}
                     sx={{width: "85%"}}
                     breakpoints={[
-                        {maxWidth: 1100, cols: 1},
-                        {maxWidth: 1200, cols: 2},
+                        {maxWidth: 1200, cols: 1},
                     ]}
                 >
                     <Overview
@@ -171,11 +136,10 @@ export default function Home() {
                         radius="md"
                         height={"100%"}
                     >
-                        {!loading && <ProposalTable data={proposals!} name={name}/>}
+                        {!loading && <ProposalTable data={proposals!} name={name} chainId={chainId} safeAddress={router.query.address as string}/>}
                     </CustomSkeleton>
                 </SimpleGrid>
             </Center>
-            {modal}
         </Layout>
     );
 }

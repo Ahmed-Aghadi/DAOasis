@@ -28,7 +28,7 @@ export type OverviewProps = {
 export default function Overview({loading, address, name, chainId, balance, description, threshold}: OverviewProps) {
     return (
         <CustomSkeleton visible={loading}>
-            <Paper p="xl" bg="#c4b7eb">
+            <Paper p="xl" bg="#c4b7eb" sx={{height: "100%"}}>
                 <Group position={"apart"}>
                 <Title ml={"md"} p={"sm"} size={"large"} fw={500} color="white">Overview</Title>
                     {threshold && <Badge>Threshold: {threshold}</Badge>}

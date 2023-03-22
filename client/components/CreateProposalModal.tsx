@@ -36,7 +36,7 @@ const style = (theme: any) => ({
     }
 })
 
-export default function CreateProposalModal({address, name}: { address: string, name: string }) {
+export default function CreateProposalModal({address, name, chainId}: { address: string, name: string, chainId: string }) {
     const userContext = useContext(PolybaseContext);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -81,7 +81,7 @@ export default function CreateProposalModal({address, name}: { address: string, 
                 color: "green",
             });
             setTimeout(() => {
-                router.push(`/proposal?id=${id}&name=${name}`)
+                router.push(`/proposal?id=${id}&name=${name}&address=${address}&chainId=${chainId}`)
             },1500)
         } catch (e) {
             console.log(e);
