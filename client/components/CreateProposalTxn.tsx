@@ -113,8 +113,11 @@ export default function CreateProposalTxn() {
         const txHash = await proposeTransaction(safeContext.provider!,router.query.address as string, router.query.chainId as string, values.contractAddress, "0", data)
         console.log("fds",txHash)
         const response = await addTxnHash(router.query.id as string, txHash)
-        console.log(response.data)
+        console.log(response)
         setLoading(false)
+        setTimeout(() => {
+            router.back()
+        }, 1500)
     }
 
     return (

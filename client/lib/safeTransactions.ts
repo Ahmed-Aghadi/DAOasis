@@ -78,16 +78,15 @@ export const proposeTransaction = async ( provider_: SafeEventEmitterProvider, s
 export const getPendingTx = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string) => {
     const { safe, service } = await getSafeService(provider_, safeAddress, chainId);
     const pendingTransactions = (
-        await service.getPendingTransactions(safeAddress)
+        await service.getMultisigTransactions(safeAddress)
     ).results;
     console.log("Pending transactions:", pendingTransactions);
     return pendingTransactions;
 };
 
-export const confirmTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string) => {
+export const confirmTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, transaction: any) => {
     const { signer, safe, service } = await getSafeService(provider_, safeAddress, chainId);
-    // Get the transaction
-    const transaction = (await getPendingTx(provider_, safeAddress, chainId))[0];
+
     // const transactions = await service.getPendingTransactions()
     // const transactions = await service.getIncomingTransactions()
     // const transactions = await service.getMultisigTransactions()
@@ -113,11 +112,8 @@ export const confirmTransaction = async (provider_: SafeEventEmitterProvider, sa
     return signatureResponse;
 };
 
-export const executeTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string) => {
+export const executeTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, transaction: any) => {
     const { safe, service } = await getSafeService(provider_, safeAddress, chainId);
-
-    // Get the transaction
-    const transaction = (await getPendingTx(provider_, safeAddress, chainId))[0];
 
     const safeTxHash = transaction.safeTxHash;
 
@@ -143,6 +139,7 @@ export const executeTransaction = async (provider_: SafeEventEmitterProvider, sa
         console.log(
             `https://goerli.etherscan.io/tx/${contractReceipt?.transactionHash}`
         );
+        return `https://goerli.etherscan.io/tx/${contractReceipt?.transactionHash}`
     } else {
         console.log("Transaction invalid. Transaction was not executed.");
     }

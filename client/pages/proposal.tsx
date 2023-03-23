@@ -7,6 +7,7 @@ import {getMultiSigProposal} from "@/lib/polybase";
 import {StyledTabs} from "@/components/StyledTabs";
 import ViewReply from "@/components/ViewReply";
 import CreateProposalTxn from "@/components/CreateProposalTxn";
+import ProposalAction from "@/components/ProposalActions";
 
 export type ProposalData = {
     createdAt: string;
@@ -20,6 +21,7 @@ export type ProposalData = {
         id: string;
     }[],
     transactionHash: string;
+    chainId?: string;
 }
 
 export default function Home() {
@@ -77,9 +79,7 @@ export default function Home() {
                     <Paper my="md" p='md' bg="#eeebf7" radius="lg">
                         {!proposalData?.transactionHash && <CreateProposalTxn/>}
                         {proposalData?.transactionHash && (
-                            <Group spacing="md">
-                                <Text color="#CC5DE8" size="lg">Transaction Hash: {proposalData.transactionHash}</Text>
-                            </Group>
+                            <ProposalAction createdAt={proposalData.createdAt} creator={proposalData.creator} description={proposalData.description} id={proposalData.id} title={proposalData.title} multiSigId={proposalData.multiSigId} replies={proposalData.replies} transactionHash={proposalData.transactionHash} chainId={router?.query?.chainId as string} />
                         )}
                     </Paper>
                 </Tabs.Panel>

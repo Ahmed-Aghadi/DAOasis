@@ -14,6 +14,7 @@ import {
 import makeBlockie from "ethereum-blockies-base64";
 import {IconCheck, IconCopy, IconExternalLink} from "@tabler/icons-react";
 import {CustomSkeleton} from "@/components/CustomSkeleton";
+import {getChainDetails} from "@/lib/getChainDetails";
 
 export type OverviewProps = {
     loading: boolean
@@ -59,7 +60,7 @@ export default function Overview({loading, address, name, chainId, balance, desc
                         )}
                     </CopyButton>
                     <ActionIcon component={"a"} target={"_blank"}
-                                href={`${getChainDetails(chainId).explorer}${address}`}>
+                                href={`${getChainDetails(chainId).explorer}address/${address}`}>
                         <Tooltip label={"View on Explorer"} position="top" withArrow>
                             <IconExternalLink color={"teal"} size="1rem"/>
                         </Tooltip>
@@ -75,39 +76,4 @@ export default function Overview({loading, address, name, chainId, balance, desc
             </Paper>
         </CustomSkeleton>
     )
-}
-
-const getChainDetails = (chainId: string) => {
-    switch (chainId) {
-        case "0x64":
-            return {
-                name: "Gnosis",
-                token: "XDAI",
-                explorer: "https://gnosisscan.io/address/"
-            }
-        case "0x89":
-            return {
-                name: "Polygon",
-                token: "MATIC",
-                explorer: "https://polygonscan.com/address/"
-            }
-        case "0x5":
-            return {
-                name: "Goerli",
-                token: "GoerliETH",
-                explorer: "https://goerli.etherscan.io/address/"
-            }
-        case "0xa":
-            return {
-                name: "Optimism",
-                token: "ETH",
-                explorer: "https://optimistic.etherscan.io/address/"
-            }
-        default:
-            return {
-                name: "Goerli",
-                token: "GoerliETH",
-                explorer: "https://goerli.etherscan.io/address/"
-            }
-    }
 }
