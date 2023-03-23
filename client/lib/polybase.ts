@@ -22,10 +22,22 @@ interface Proposal {
     multiSigId: string;
 }
 
-interface ProposalReply {
+interface App {
+    id: `0x${string}`;
+    name: string;
     description: string;
     creator: string;
-    multiSigProposalId: string;
+    chainId: string;
+    imageCid: string;
+    abi: string;
+    website: string;
+}
+
+interface Reply {
+    description: string;
+    creator: string;
+    id: string;
+    collection: "MultiSigProposals" | "App";
 }
 
 export const createProfile = async (profile: Profile) => {
@@ -79,6 +91,27 @@ export const createMultiSigProposal = async ({
     return response.data;
 };
 
+export const createApp = async (app: App) => {
+    const { id, name, description, creator, chainId, imageCid, abi, website } =
+        app;
+    const response = await axios.post(`/api/polybase`, {
+        collection: "App",
+        id,
+        name,
+        description,
+        creator,
+        chainId,
+        imageCid,
+        abi,
+        website,
+    });
+
+    if (response.status !== 200) {
+        throw new Error("Error creating app");
+    }
+    return response.data;
+};
+
 export const updateProfile = async (profile: Profile) => {
     const { id, name } = profile;
     const response = await fetch(`/api/polybase`, {
@@ -95,12 +128,13 @@ export const updateProfile = async (profile: Profile) => {
 };
 
 export const addReply = async ({
-    multiSigProposalId: id,
+    id,
     creator,
     description,
-}: ProposalReply) => {
+    collection,
+}: Reply) => {
     const response = await axios.patch(`/api/polybase`, {
-        collection: "MultiSigProposals",
+        collection: collection,
         id,
         creator,
         description,
@@ -197,6 +231,31 @@ export const getReply = async (id: string) => {
     });
     if (response.status !== 200) {
         throw new Error("Error getting reply");
+    }
+    return response.data;
+};
+
+export const getApps = async () => {
+    const response = await axios.get(`/api/polybase`, {
+        params: {
+            collection: "App",
+        },
+    });
+    if (response.status !== 200) {
+        throw new Error("Error getting apps");
+    }
+    return response.data;
+};
+
+export const getApp = async (id: string) => {
+    const response = await axios.get(`/api/polybase`, {
+        params: {
+            id,
+            collection: "App",
+        },
+    });
+    if (response.status !== 200) {
+        throw new Error("Error getting app");
     }
     return response.data;
 };
