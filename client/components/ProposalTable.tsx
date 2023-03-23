@@ -20,7 +20,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import CreateProposalModal from "@/components/CreateProposalModal";
-import {router} from "next/client";
+import {useRouter} from "next/router";
 
 const useStyles = createStyles((theme) => ({
     th: {
@@ -136,6 +136,7 @@ function sortData(
 
 export function ProposalTable({data, name, safeAddress, chainId}: TableSortProps) {
     const {classes} = useStyles();
+    const router = useRouter()
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
     const [modalOpened, setModalOpened] = useState(false);
