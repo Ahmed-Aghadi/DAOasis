@@ -13,11 +13,14 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
+    // console.log(req.body)
+    // res.status(400).json({error: "Invalid request"})
+    // return
     if (req.method === "POST") {
         let file: File
-        const {name, description, filesData, type} = req.body
+        const {filesData} = req.body
         let _file = Buffer.from(filesData[0].buffer.data);
-        file = new File([_file], name, {type: `${type}/*`})
+        file = new File([_file], "image", {type: `image/*`})
 
         console.log("file:", file)
 
@@ -28,5 +31,12 @@ export default async function handler(
         const cid = await client.storeBlob(file!)
         console.log(cid)
         res.status(200).json({"cid": cid})
+        return
     }
+}
+
+export const config = {
+    api: {
+        limit: "50mb",
+    },
 }

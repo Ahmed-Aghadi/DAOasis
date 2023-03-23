@@ -10,7 +10,7 @@ import {useRouter} from "next/router";
 import {addTxnHash} from "@/lib/polybase";
 import {showNotification} from "@mantine/notifications";
 
-const style = (theme: any) => ({
+export const style = (theme: any) => ({
     input: {
         backgroundColor: theme.colors.blueTheme[3],
         borderRadius: "0.5rem",
