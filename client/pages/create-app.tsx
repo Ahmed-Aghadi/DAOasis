@@ -10,6 +10,7 @@ import {style} from "@/components/CreateProposalTxn";
 import {IconChevronDown, IconUpload} from "@tabler/icons-react";
 import {uploadImage} from "@/lib/uploadImage";
 import {showNotification} from "@mantine/notifications";
+import {createApp} from "@/lib/polybase";
 
 const selectStyle = (theme: any) => ({
     input: {
@@ -62,11 +63,11 @@ export default function CreateApp() {
             website: '',
             abi: '',
             functionName: '',
-            contractAddress: '',
+            id: '',
             chainId: '',
         },
         validate: {
-            contractAddress: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
+            id: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
             abi: (value) => validateAbiInput(value) ? undefined : "Invalid ABI",
             functionName: (value) => handleSelectChange(value) ? undefined : "Select a function",
         },
@@ -86,7 +87,25 @@ export default function CreateApp() {
         setLoading(true)
         try{
             const imageCid = await uploadImage(image!)
-            console.log(imageCid)
+            const {functionAbi} = parseAbiToFunction(values.abi)
+            const response = await createApp({
+                name: values.name,
+                description: values.description,
+                creator: values.creator,
+                website: values.website,
+                abi: JSON.stringify(functionAbi),
+                chainId: values.chainId,
+                id: values.id,
+                imageCid: imageCid,
+            })
+            console.log(response)
+            showNotification({
+                title: "Success",
+                message: "App created successfully",
+                autoClose: true,
+            })
+            form.reset()
+            setImage(null)
         } catch (e: any) {
             console.log(e)
             showNotification({
@@ -153,7 +172,7 @@ export default function CreateApp() {
                            label="App Website URL" {...form.getInputProps("website")}
                            styles={(theme) => style(theme)}/>
                 <TextInput my="sm" placeholder="Enter the contract address" required
-                           label="Enter the contract address you want to interact with" {...form.getInputProps("contractAddress")}
+                           label="Enter the contract address you want to interact with" {...form.getInputProps("id")}
                            styles={(theme) => style(theme)}/>
                 <Select
                     data={[

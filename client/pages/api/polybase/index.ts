@@ -382,7 +382,6 @@ export default async function handler(
             const response = await db
                 .collection("App")
                 .create([
-                    proposalId as string,
                     id,
                     name,
                     description,
