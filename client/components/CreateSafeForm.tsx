@@ -88,8 +88,7 @@ export default function CreateSafeForm() {
                 chainId: safeContext.safeAuthSignInResponse?.chainId!,
             });
             console.log("Safe created in Polybase", safePolybaseResponse);
-            const currentMultiSig = safePolybaseResponse.response
-                .data as MultiSig;
+            const currentMultiSig = safePolybaseResponse.response.data as MultiSig;
             userContext.setMultiSigs([
                 ...userContext.multiSigs,
                 currentMultiSig,

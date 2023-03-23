@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import {
     createStyles,
     Table,
@@ -11,13 +11,14 @@ import {
     rem,
     Paper, Title,
 } from "@mantine/core";
-import { keys } from "@mantine/utils";
+import {keys} from "@mantine/utils";
 import {
     IconSelector,
     IconChevronDown,
     IconChevronUp,
     IconSearch,
 } from "@tabler/icons-react";
+import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
     th: {
@@ -64,11 +65,12 @@ interface ThProps {
     children: React.ReactNode;
     reversed: boolean;
     sorted: boolean;
+
     onSort(): void;
 }
 
-function Th({ children, reversed, sorted, onSort }: ThProps) {
-    const { classes } = useStyles();
+function Th({children, reversed, sorted, onSort}: ThProps) {
+    const {classes} = useStyles();
     const Icon = sorted
         ? reversed
             ? IconChevronUp
@@ -82,7 +84,7 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
                         {children}
                     </Text>
                     <Center className={classes.icon}>
-                        <Icon size="0.9rem" stroke={1.5} />
+                        <Icon size="0.9rem" stroke={1.5}/>
                     </Center>
                 </Group>
             </UnstyledButton>
@@ -109,7 +111,7 @@ function sortData(
         search: string;
     }
 ) {
-    const { sortBy } = payload;
+    const {sortBy} = payload;
 
     if (!sortBy) {
         return filterData(data, payload.search);
@@ -127,8 +129,8 @@ function sortData(
     );
 }
 
-export function OwnersDetails({ data }: TableSortProps) {
-    const { classes } = useStyles();
+export function OwnersDetails({data}: TableSortProps) {
+    const {classes} = useStyles();
     const [search, setSearch] = useState("");
     const [sortedData, setSortedData] = useState(data);
     const [sortBy, setSortBy] = useState<keyof Omit<RowData, "exists"> | null>(
@@ -140,11 +142,11 @@ export function OwnersDetails({ data }: TableSortProps) {
         const reversed = field === sortBy ? !reverseSortDirection : false;
         setReverseSortDirection(reversed);
         setSortBy(field);
-        setSortedData(sortData(data, { sortBy: field, reversed, search }));
+        setSortedData(sortData(data, {sortBy: field, reversed, search}));
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.currentTarget;
+        const {value} = event.currentTarget;
         setSearch(value);
         setSortedData(
             sortData(data, {
@@ -157,8 +159,16 @@ export function OwnersDetails({ data }: TableSortProps) {
 
     const rows = sortedData.map((row) => (
         <tr className={classes.tr} key={row.id}>
-            <td>{row.exists ? row.name : "-"}</td>
-            <td>{row.id}</td>
+            <td>
+                <Link href={`/user?address=${row.id}`}>
+                    {row.exists ? row.name : "-"}
+                </Link>
+            </td>
+            <td>
+                <Link href={`/user?address=${row.id}`}>
+                    {row.id}
+                </Link>
+            </td>
         </tr>
     ));
 
@@ -169,7 +179,7 @@ export function OwnersDetails({ data }: TableSortProps) {
                 <TextInput
                     placeholder="Search by any field"
                     mb="md"
-                    icon={<IconSearch size="0.9rem" stroke={1.5} color={"#3304ba"} />}
+                    icon={<IconSearch size="0.9rem" stroke={1.5} color={"#3304ba"}/>}
                     value={search}
                     onChange={handleSearchChange}
                     styles={{
@@ -191,36 +201,36 @@ export function OwnersDetails({ data }: TableSortProps) {
                     verticalSpacing="xs"
                 >
                     <thead>
-                        <tr>
-                            <Th
-                                sorted={sortBy === "name"}
-                                reversed={reverseSortDirection}
-                                onSort={() => setSorting("name")}
+                    <tr>
+                        <Th
+                            sorted={sortBy === "name"}
+                            reversed={reverseSortDirection}
+                            onSort={() => setSorting("name")}
 
-                            >
-                                Name
-                            </Th>
-                            <Th
-                                sorted={sortBy === "id"}
-                                reversed={reverseSortDirection}
-                                onSort={() => setSorting("id")}
-                            >
-                                Address
-                            </Th>
-                        </tr>
+                        >
+                            Name
+                        </Th>
+                        <Th
+                            sorted={sortBy === "id"}
+                            reversed={reverseSortDirection}
+                            onSort={() => setSorting("id")}
+                        >
+                            Address
+                        </Th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {rows.length > 0 ? (
-                            rows
-                        ) : (
-                            <tr>
-                                <td>
-                                    <Text weight={500} align="center" sx={{color: "#3304ba"}}>
-                                        Nothing found
-                                    </Text>
-                                </td>
-                            </tr>
-                        )}
+                    {rows.length > 0 ? (
+                        rows
+                    ) : (
+                        <tr>
+                            <td>
+                                <Text weight={500} align="center" sx={{color: "#3304ba"}}>
+                                    Nothing found
+                                </Text>
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </Table>
             </ScrollArea>

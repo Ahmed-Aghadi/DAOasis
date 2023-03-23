@@ -8,6 +8,7 @@ import safeAuthContext from "@/contexts/SafeAuthContext";
 import {proposeTransaction} from "@/lib/safeTransactions";
 import {useRouter} from "next/router";
 import {addTxnHash} from "@/lib/polybase";
+import {showNotification} from "@mantine/notifications";
 
 const style = (theme: any) => ({
     input: {
@@ -67,7 +68,7 @@ export default function CreateProposalTxn() {
 
     const validateAbiInput = (abi: string) => {
         try {
-            const parsedAbi = parseAbiToFunction(abi);
+            const parsedAbi = parseAbiToFunction(abi).filteredAbi;
             // console.log(parsedAbi);
             abiFunctions = parsedAbi;
             const selectData_ = parsedAbi.map((abiFunction: any, index: number) => {
@@ -110,7 +111,9 @@ export default function CreateProposalTxn() {
                 args_[i] = parseInt(values.args[i])
             }
         }
-        const iFace = new ethers.utils.Interface(JSON.parse(values.abi))
+        try{
+            const parsedAbi = parseAbiToFunction(values.abi).functionAbi;
+        const iFace = new ethers.utils.Interface([parsedAbi[values.functionName]])
         const data = iFace.encodeFunctionData(func.name, args_)
         console.log("data", data)
         const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, values.contractAddress, values.value, data)
@@ -120,6 +123,17 @@ export default function CreateProposalTxn() {
         setTimeout(() => {
             router.back()
         }, 1500)
+
+        } catch (e: any){
+            console.log(e)
+            showNotification({
+                title: "Error",
+                message: e.message,
+                color: "red",
+                autoClose: false,
+            })
+            setLoading(false)
+        }
     }
 
     const handleTransferSubmit = async (values: any) => {
