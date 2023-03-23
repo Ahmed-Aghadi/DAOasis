@@ -14,6 +14,8 @@ import {
     OperationType,
     SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
+import { enableSafeModule } from "@/lib/safeModule";
+import { getRpc } from "@/lib/getRpc";
 
 const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
 
@@ -78,6 +80,12 @@ export default function Home() {
             data: "0x",
             operation: OperationType.Call,
         };
+        // const safeTransactionData = enableSafeModule(
+        //     safeAddress,
+        //     "0x289420875bC9d819903bcC656fF9341096a07621",
+        //     ethers.getDefaultProvider(getRpc("0x5")),
+        //     "0x13881"
+        // );
         const safeTransaction = await safe.createTransaction({
             safeTransactionData,
         });
@@ -104,7 +112,7 @@ export default function Home() {
     const getPendingTx = async () => {
         const { safe, service } = await getSafeService();
         const pendingTransactions = (
-            await service.getPendingTransactions(safeAddress)
+            await service.getMultisigTransactions(safeAddress)
         ).results;
         console.log("Pending transactions:", pendingTransactions);
         return pendingTransactions;
