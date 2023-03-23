@@ -134,6 +134,36 @@ const schema = `
             this.creator = creator;
         }
     }
+
+    @public
+    collection App {
+        // Multisig Address
+        id: string;
+        name: string;
+        description: string;
+        creator: string;
+        chainId: string;
+        imageCid: string;
+        abi: string;
+        website: string;
+        replies: Reply[];
+
+        constructor (id: string, name: string, description: string, creator: string, chainId: string, imageCid: string, abi: string, website: string) {
+            this.id = id;
+            this.name = name;
+            this.description = description;
+            this.creator = creator;
+            this.chainId = chainId;
+            this.imageCid = imageCid;
+            this.abi = abi;
+            this.website = website;
+            this.replies = [];
+        }
+
+        function addReply (reply: Reply) {
+            this.replies.push(reply);
+        }
+    }
 `;
 
 const signInPolybase = () => {
@@ -244,6 +274,9 @@ export default async function handler(
         } else if (collection === "Reply") {
             const replyCollection = await db.collection("Reply");
             await handleGet(req, res, replyCollection);
+        } else if (collection === "App") {
+            const appCollection = await db.collection("App");
+            await handleGet(req, res, appCollection);
         } else {
             res.status(400).json({ response: "Invalid collection" });
         }
@@ -319,6 +352,45 @@ export default async function handler(
                     description,
                     createdAt.toString(),
                     creator,
+                ]);
+            res.status(200).json({ response: response });
+            return;
+        } else if (req.body.collection === "App") {
+            const {
+                name,
+                description,
+                creator,
+                chainId,
+                imageCid,
+                abi,
+                website,
+            } = req.body;
+            if (
+                !body.hasOwnProperty("name") ||
+                !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("creator") ||
+                !body.hasOwnProperty("chainId") ||
+                !body.hasOwnProperty("imageCid") ||
+                !body.hasOwnProperty("abi") ||
+                !body.hasOwnProperty("website")
+            ) {
+                res.status(400).json({ response: "Missing required fields" });
+                return;
+            }
+            const proposalId = uuidv4();
+            // Create a record
+            const response = await db
+                .collection("App")
+                .create([
+                    proposalId as string,
+                    id,
+                    name,
+                    description,
+                    creator,
+                    chainId,
+                    imageCid,
+                    abi,
+                    website,
                 ]);
             res.status(200).json({ response: response });
             return;
@@ -423,6 +495,35 @@ export default async function handler(
 
             const recordData = await db
                 .collection("MultiSigProposals")
+                .record(id as string)
+                .call("addReply", [
+                    await db.collection("Reply").record(replyId as string),
+                ]);
+
+            res.status(200).json({ response: recordData });
+            return;
+        } else if (req.body.collection === "App") {
+            const { description, creator } = req.body;
+            if (
+                !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("creator")
+            ) {
+                res.status(400).json({ response: "Missing required fields" });
+                return;
+            }
+            const replyId = uuidv4();
+            const createdAt = Date.now(); // or (new Date()).getTime()
+            const replyRecordData = await db
+                .collection("Reply")
+                .create([
+                    replyId as string,
+                    description,
+                    createdAt.toString(),
+                    creator,
+                ]);
+
+            const recordData = await db
+                .collection("App")
                 .record(id as string)
                 .call("addReply", [
                     await db.collection("Reply").record(replyId as string),
