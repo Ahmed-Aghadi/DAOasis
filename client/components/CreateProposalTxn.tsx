@@ -41,12 +41,14 @@ export default function CreateProposalTxn() {
             contractAddress: "",
             functionName: "",
             abi: "",
+            value: "0",
             args: [],
         },
         validate: {
             contractAddress: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
             abi: (value) => validateAbiInput(value) ? undefined : "Invalid ABI",
             functionName: (value) => handleSelectChange(value) ? undefined : "Select a function",
+            value: (value) => /[0-9]*\.[0-9]+/i.test(value) ? "Invalid value" : undefined,
         },
         validateInputOnChange: true,
     })
@@ -58,6 +60,7 @@ export default function CreateProposalTxn() {
         },
         validate: {
             contractAddress: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
+            value: (value) => /[0-9]*\.[0-9]+/i.test(value) ? undefined : "Invalid value",
         },
         validateInputOnChange: true,
     })
@@ -102,16 +105,26 @@ export default function CreateProposalTxn() {
         const func = abiFunctions[values.functionName]
         console.log(func)
         let args_ = values.args
-        for(let i = 0; i < values.args.length; i++) {
-            if(func.inputs[i].type.includes("uint")) {
+        for (let i = 0; i < values.args.length; i++) {
+            if (func.inputs[i].type.includes("uint")) {
                 args_[i] = parseInt(values.args[i])
             }
         }
         const iFace = new ethers.utils.Interface(JSON.parse(values.abi))
         const data = iFace.encodeFunctionData(func.name, args_)
         console.log("data", data)
-        const txHash = await proposeTransaction(safeContext.provider!,router.query.address as string, router.query.chainId as string, values.contractAddress, "0", data)
-        console.log("fds",txHash)
+        const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, values.contractAddress, values.value, data)
+        const response = await addTxnHash(router.query.id as string, txHash)
+        console.log(response)
+        setLoading(false)
+        setTimeout(() => {
+            router.back()
+        }, 1500)
+    }
+
+    const handleTransferSubmit = async (values: any) => {
+        setLoading(true)
+        const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, values.contractAddress, values.value, "")
         const response = await addTxnHash(router.query.id as string, txHash)
         console.log(response)
         setLoading(false)
@@ -178,17 +191,23 @@ export default function CreateProposalTxn() {
                                     })}/>
                             {selectedFunctionComponent}
                             {selectedFunctionComponent &&
-                                <Button loading={loading} fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
-                                    root: {
-                                        backgroundColor: theme.colors.violet[6],
-                                        "&:hover": {
-                                            backgroundColor: `${theme.colors.violet[4]} !important`,
-                                            color: `${theme.colors.blueTheme[1]} !important`,
-                                        },
-                                    }
-                                })}>
-                                    Create Proposal
-                                </Button>}
+                                <>
+                                    <TextInput my="sm" placeholder="Enter the value" required
+                                               label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" {...txnProposalForm.getInputProps("value")}
+                                               styles={(theme) => style(theme)}/>
+                                    <Button loading={loading} fullWidth type="submit" color="red" mt="md"
+                                            styles={(theme) => ({
+                                                root: {
+                                                    backgroundColor: theme.colors.violet[6],
+                                                    "&:hover": {
+                                                        backgroundColor: `${theme.colors.violet[4]} !important`,
+                                                        color: `${theme.colors.blueTheme[1]} !important`,
+                                                    },
+                                                }
+                                            })}>
+                                        Create Proposal
+                                    </Button>
+                                </>}
                         </form>
                     </Accordion.Panel>
                 </Accordion.Item>
@@ -199,14 +218,13 @@ export default function CreateProposalTxn() {
                         </Title>
                     </Accordion.Control>
                     <Accordion.Panel>
-                        <form onSubmit={transferProposalForm.onSubmit(async (values) => console.log(values))}>
+                        <form onSubmit={transferProposalForm.onSubmit(async (values) => handleTransferSubmit(values))}>
                             <TextInput my="sm" placeholder="Enter the contract address" required
                                        label="Enter the contract address you want to send funds to" {...transferProposalForm.getInputProps("contractAddress")}
                                        styles={(theme) => style(theme)}/>
-                            <NumberInput my="sm" placeholder="Enter the amount" required precision={2} min={0.01}
-                                         step={0.01}
-                                         label="Enter the amount you want to send" {...transferProposalForm.getInputProps("value")
-                                         } styles={(theme) => style(theme)}/>
+                            <TextInput my="sm" placeholder="Enter the amount" required
+                                       label="Enter the amount you want to send" {...transferProposalForm.getInputProps("value")
+                                       } styles={(theme) => style(theme)}/>
                             <Button fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
                                 root: {
                                     backgroundColor: theme.colors.violet[6],
