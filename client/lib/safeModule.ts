@@ -38,7 +38,7 @@ export function enableSafeModule(
             ],
         },
         provider,
-        parseInt(chainId, 16),
+        1,
         Date.now().toString()
     );
 
