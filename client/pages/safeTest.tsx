@@ -17,7 +17,7 @@ import {
 import { enableSafeModule } from "@/lib/safeModule";
 import { getRpc } from "@/lib/getRpc";
 
-const safeAddress = "0x8Fe5eaba626826BE13097D8902FB5a3D080F14a5";
+const safeAddress = "0x035f97974104538509601B461eb3b3342379d0B0";
 
 export default function Home() {
     const [modalOpened, setModalOpened] = useState(false);
@@ -82,10 +82,11 @@ export default function Home() {
         };
         // const safeTransactionData = enableSafeModule(
         //     safeAddress,
-        //     "0x289420875bC9d819903bcC656fF9341096a07621",
+        //     "0x464e3F471628E162FA34F130F4C3bCC41fF7635d",
         //     ethers.getDefaultProvider(getRpc("0x5")),
-        //     "0x13881"
+        //     "0x1A4"
         // );
+        console.log("safeTransactionData", safeTransactionData);
         const safeTransaction = await safe.createTransaction({
             safeTransactionData,
         });
@@ -112,7 +113,7 @@ export default function Home() {
     const getPendingTx = async () => {
         const { safe, service } = await getSafeService();
         const pendingTransactions = (
-            await service.getMultisigTransactions(safeAddress)
+            await service.getPendingTransactions(safeAddress)
         ).results;
         console.log("Pending transactions:", pendingTransactions);
         return pendingTransactions;
