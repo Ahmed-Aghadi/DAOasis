@@ -1,0 +1,13 @@
+{
+    "folders": [
+		{
+			"name": "zodiac-mod-starter-kit",
+			"path": "."
+		},
+		{
+			"name": "contracts",
+			"path": "../zodiac-module-connext/contracts"
+		}
+	],
+    "settings": {}
+}

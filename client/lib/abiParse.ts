@@ -1,4 +1,4 @@
-export function parseAbiToFunction(abi: string): any {
+export function parseAbiToFunction(abi: string) {
     try {
         const parsedAbi = JSON.parse(abi);
         const functionAbi = parsedAbi.filter(
