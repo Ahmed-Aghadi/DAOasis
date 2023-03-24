@@ -1,4 +1,4 @@
-import {Title, Text, TextInput, Textarea, Select, Button, Accordion, NumberInput} from "@mantine/core";
+import {Title, Text, TextInput, Textarea, Select, Button, Accordion} from "@mantine/core";
 import {useContext, useState} from "react";
 import {useForm} from "@mantine/form";
 import {ethers} from "ethers";
@@ -28,12 +28,13 @@ export const style = (theme: any) => ({
     }
 })
 
+let abiFunctions: any[] = []
+
 export default function CreateProposalTxn() {
     const safeContext = useContext(safeAuthContext)
     const router = useRouter()
     const [loading, setLoading] = useState(false)
 
-    let abiFunctions: any[] = []
     const [selectData, setSelectData] = useState<any[]>([]);
     const [selectedFunctionComponent, setSelectedFunctionComponent] = useState<any>(null);
 
@@ -73,7 +74,7 @@ export default function CreateProposalTxn() {
             abiFunctions = parsedAbi;
             const selectData_ = parsedAbi.map((abiFunction: any, index: number) => {
                 return {
-                    label: `${abiFunction.name}(${abiFunction.inputs.map((input: any) => input.type).join(", ")})`,
+                    label: `${abiFunction.name}(${abiFunction.inputs.map((input: any) => input.type).join(", ")})  - ${abiFunction.stateMutability}`,
                     value: index,
                 }
             })

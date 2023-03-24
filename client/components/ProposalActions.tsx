@@ -30,7 +30,7 @@ export default function ProposalAction({transactionHash, chainId, multiSigId}: P
         })()
     }, [transactionHash, chainId, multiSigId, safeContext.provider])
 
-    console.log("proposalState", proposalState)
+    // console.log("proposalState", proposalState)
 
     const handleConfirmTxn = async () => {
         setIsConfirming(true)
@@ -67,6 +67,17 @@ export default function ProposalAction({transactionHash, chainId, multiSigId}: P
     }
 
     const handleExecuteTxn = async () => {
+        if(chainId !== safeContext.safeAuthSignInResponse?.chainId){
+            showNotification({
+                id: "executing",
+                title: "Transaction Execution Failed",
+                message: "Your transaction could not executed. You are connected to the wrong network.",
+                loading: false,
+                autoClose: false,
+                color: "red"
+            })
+            return
+        }
         setExecuting(true)
         showNotification({
             id: "executing",

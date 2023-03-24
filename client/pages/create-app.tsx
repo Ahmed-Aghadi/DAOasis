@@ -75,7 +75,7 @@ export default function CreateApp() {
     })
 
     const handleSubmit = async (values: any) => {
-        if(!image) {
+        if (!image) {
             showNotification({
                 title: "Error",
                 message: "Please upload an image",
@@ -85,7 +85,7 @@ export default function CreateApp() {
             return;
         }
         setLoading(true)
-        try{
+        try {
             const imageCid = await uploadImage(image!)
             const {functionAbi} = parseAbiToFunction(values.abi)
             const response = await createApp({
@@ -161,73 +161,76 @@ export default function CreateApp() {
                 </title>
             </Head>
             <Title color="#AE3EC9">Create App</Title>
-            <form onSubmit={form.onSubmit(values => handleSubmit(values))}>
-                <TextInput my="sm" placeholder="Enter the name of the app" required
-                           label="App Name" {...form.getInputProps("name")}
-                           styles={(theme) => style(theme)}/>
-                <TextInput my="sm" placeholder="Enter the description of the app" required
-                           label="App Description" {...form.getInputProps("description")}
-                           styles={(theme) => style(theme)}/>
-                <TextInput my="sm" placeholder="Enter the website url of the app" required
-                           label="App Website URL" {...form.getInputProps("website")}
-                           styles={(theme) => style(theme)}/>
-                <TextInput my="sm" placeholder="Enter the contract address" required
-                           label="Enter the contract address you want to interact with" {...form.getInputProps("id")}
-                           styles={(theme) => style(theme)}/>
-                <Select
-                    data={[
-                        {label: "Gnosis", value: "0x64"},
-                        {label: "Goerli", value: "0x5"},
-                        {label: "Polygon", value: "0x89"},
-                        {label: "Optimism", value: "0xa"},
-                    ]}
-                    rightSection={<IconChevronDown color="#fff" size="1rem"/>}
-                    my="sm" placeholder="Enter the chain ID" required
-                    label="Contract Chain ID" {...form.getInputProps("chainId")}
-                    styles={(theme) => selectStyle(theme)}/>
-                <FileInput my="sm" placeholder="Upload the image" required
-                           label="Upload the image" accept="image/*"
-                           icon={<IconUpload color="#fff" size={rem(14)}/>}
-                           onChange={setImage}
-                           styles={(theme) => ({
-                               ...style(theme),
-                               placeholder: {
-                                   color: `${theme.colors.blueTheme[5]} !important`,
-                               }
-                           })}/>
-                {image &&
-                    <Center>
-                        <Image src={URL.createObjectURL(image)} width={450} alt="App Image"/>
-                    </Center>
-                }
-                <Textarea minRows={4} maxRows={9} my="sm"
-                          placeholder='[{"inputs":[], "name": "myFunction", "type":"function"}]' required
-                          label='Enter your ABI json  [{"inputs":[], "name": "myFunction", "type":"function"}]' {...form.getInputProps("abi")}
-                          styles={(theme) => style(theme)}
-                />
-                <Select data={selectData} rightSection={<IconChevronDown color="#fff" size="1rem"/>}
-                        placeholder="Select a function" searchable
-                        label="Select a function" {...form.getInputProps("functionName")}
-                        styles={(theme) => selectStyle(theme)}/>
-                {selectedFunctionComponent}
-                {selectedFunctionComponent &&
-                    <TextInput my="sm" placeholder="Enter the value" required
-                               label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" readOnly
+            <Center>
+                <form onSubmit={form.onSubmit(values => handleSubmit(values))}>
+                    <TextInput my="sm" placeholder="Enter the name of the app" required
+                               label="App Name" {...form.getInputProps("name")}
                                styles={(theme) => style(theme)}/>
-                }
-                <Button loading={loading} fullWidth type="submit" color="red" mt="md"
-                        styles={(theme) => ({
-                            root: {
-                                backgroundColor: theme.colors.violet[6],
-                                "&:hover": {
-                                    backgroundColor: `${theme.colors.violet[4]} !important`,
-                                    color: `${theme.colors.blueTheme[1]} !important`,
-                                },
-                            }
-                        })}>
-                    Create Proposal
-                </Button>
-            </form>
+                    <TextInput my="sm" placeholder="Enter the description of the app" required
+                               label="App Description" {...form.getInputProps("description")}
+                               styles={(theme) => style(theme)}/>
+                    <TextInput my="sm" placeholder="Enter the website url of the app" required
+                               label="App Website URL" {...form.getInputProps("website")}
+                               styles={(theme) => style(theme)}/>
+                    <TextInput my="sm" placeholder="Enter the contract address" required
+                               label="Enter the contract address you want to interact with" {...form.getInputProps("id")}
+                               styles={(theme) => style(theme)}/>
+                    <Select
+                        data={[
+                            {label: "Gnosis", value: "0x64"},
+                            {label: "Goerli", value: "0x5"},
+                            {label: "Polygon", value: "0x89"},
+                            {label: "Optimism", value: "0xa"},
+                        ]}
+                        rightSection={<IconChevronDown color="#fff" size="1rem"/>}
+                        my="sm" placeholder="Enter the chain ID" required
+                        label="Contract Chain ID" {...form.getInputProps("chainId")}
+                        styles={(theme) => selectStyle(theme)}/>
+                    <FileInput my="sm" placeholder="Upload the image" required
+                               label="Upload the image" accept="image/*"
+                               icon={<IconUpload color="#fff" size={rem(14)}/>}
+                               onChange={setImage}
+                               styles={(theme) => ({
+                                   ...style(theme),
+                                   placeholder: {
+                                       color: `${theme.colors.blueTheme[5]} !important`,
+                                   }
+                               })}/>
+                    {image &&
+                        <Center>
+                            <Image src={URL.createObjectURL(image)} width={450} alt="App Image"/>
+                        </Center>
+                    }
+                    <Textarea minRows={4} maxRows={9} my="sm"
+                              placeholder='[{"inputs":[], "name": "myFunction", "type":"function"}]' required
+                              label='Enter your ABI json  [{"inputs":[], "name": "myFunction", "type":"function"}]' {...form.getInputProps("abi")}
+                              styles={(theme) => style(theme)}
+                    />
+                    <Select data={selectData} rightSection={<IconChevronDown color="#fff" size="1rem"/>}
+                            placeholder="Select a function" searchable
+                            label="Select a function" {...form.getInputProps("functionName")}
+                            styles={(theme) => selectStyle(theme)}/>
+                    {selectedFunctionComponent}
+                    {selectedFunctionComponent &&
+                        <TextInput my="sm" placeholder="Enter the value" required
+                                   label="Enter the amount you want to send (Leave 0 if no amount has to be sent)"
+                                   readOnly
+                                   styles={(theme) => style(theme)}/>
+                    }
+                    <Button loading={loading} fullWidth type="submit" color="red" mt="md"
+                            styles={(theme) => ({
+                                root: {
+                                    backgroundColor: theme.colors.violet[6],
+                                    "&:hover": {
+                                        backgroundColor: `${theme.colors.violet[4]} !important`,
+                                        color: `${theme.colors.blueTheme[1]} !important`,
+                                    },
+                                }
+                            })}>
+                        Create Proposal
+                    </Button>
+                </form>
+            </Center>
         </Layout>
     )
 }
