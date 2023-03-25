@@ -6,7 +6,14 @@ import SafeAuthContext from "@/contexts/SafeAuthContext";
 import PolybaseContext from "@/contexts/PolybaseContext";
 import {ethers} from "ethers";
 import {useRouter} from "next/router";
-import {createMultiSigProposal, getMultiSigProposal, getMultiSigProposals, getProfile, getSafe} from "@/lib/polybase";
+import {
+    addModule, addTxnHash,
+    createMultiSigProposal,
+    getMultiSigProposal,
+    getMultiSigProposals,
+    getProfile,
+    getSafe
+} from "@/lib/polybase";
 import {CustomSkeleton} from "@/components/CustomSkeleton";
 import {OwnersDetails} from "@/components/OwnersDetails";
 import Overview from "@/components/Overview";
@@ -17,9 +24,12 @@ import {useForm} from "@mantine/form";
 import {IconChevronDown} from "@tabler/icons-react";
 import {selectStyle} from "./create-app";
 import {style} from "@/components/CreateProposalTxn";
-import {awaitReq} from "@toruslabs/openlogin";
+import myModuleMastercopyDeployment from "@/constants/myModuleMastercopyDeployment.abi.json";
 import {enableSafeModule} from "@/lib/safeModule";
 import {showNotification} from "@mantine/notifications";
+import {getPendingTx, proposeModuleTransaction, proposeTransaction} from "@/lib/safeTransactions";
+import { getConnextAddress } from "@/lib/getConnextAddress";
+import { getDomainId } from "@/lib/getDomainId";
 
 export default function Home() {
     const safeContext = useContext(SafeAuthContext);
@@ -38,9 +48,14 @@ export default function Home() {
     const [proposals, setProposals] = useState<ProposalData[]>()
     const [modalOpened, setModalOpened] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [proposalState, setProposalState] = useState<any>();
+    const [originModalOpened, setOriginModalOpened] = useState(false);
+    const [moduleAddress, setModuleAddress] = useState("");
+    const [proposalId, setProposalId] = useState("");
 
     useEffect(() => {
         if (!router.isReady) return;
+        if (!safeContext.provider) return;
         if (!safeAddress) {
             setLoading(false);
             setIsValid(false);
@@ -88,6 +103,14 @@ export default function Home() {
                     createdAt: proposal.data.createdAt,
                 }))
                 setProposals(proposals)
+                if (safe.moduleProposalId) {
+                    setProposalId(safe.moduleProposalId)
+                    setModuleAddress(safe.moduleAddress)
+                    const res = await getMultiSigProposal(safe?.moduleProposalId);
+                    const proposalStates = await getPendingTx(safeContext.provider!, safeAddress, chainId!)
+                    const proposal = proposalStates.find((proposal) => proposal.safeTxHash === res.response.data.transactionHash)
+                    setProposalState(proposal)
+                }
                 setLoading(false);
             } catch (error) {
                 console.log("ERROR in safe: ", error);
@@ -97,10 +120,16 @@ export default function Home() {
                 router.back()
             }
         })();
-    }, [router.isReady]);
+    }, [router.isReady, safeContext.provider, safeAddress]);
 
     const handleClick = () => {
-        setModalOpened(true);
+        if (!proposalState || (proposalState.isSuccessful && !proposalState.isExecuted)) {
+            setModalOpened(true);
+        } else if (proposalState.isSuccessful) {
+            setOriginModalOpened(true)
+        } else {
+            router.push(`/proposal?id=${proposalId}&name=${name}&address=${safeAddress}&chainId=${chainId}`)
+        }
     }
 
     const form = useForm({
@@ -126,19 +155,63 @@ export default function Home() {
                 ethers.getDefaultProvider(getRpc(chainId)),
                 values.chain
             );
+            console.log(expectedModuleAddress)
             const res = await createMultiSigProposal({
                 title: "Enable Safe Module",
                 description: "By enabling the cross-chain connext-zodiac module, the safe enabled on the other chain will be able to make transactions through the current safe. It will also enable you to send wETH to this safe. If you understand and are comfortable with these risks, you may proceed to enable the cross-chain connext-zodiac module.",
                 creator: safeContext.safeAuthSignInResponse?.eoa!,
                 multiSigId: router.query.address as `0x${string}`,
             })
+
+            const proposalId = res.response.data.id;
+            const addModuleRes = await addModule(expectedModuleAddress, proposalId, safeAddress)
+
+            const txHash = await proposeModuleTransaction(safeContext.provider!, safeAddress, chainId, safeTransactionData)
+            await addTxnHash(res.response.data.id, txHash)
+
             showNotification({
                 title: "Success",
                 message: "Proposal created successfully",
                 color: "green",
             })
             setTimeout(() => {
-                setModalOpened(false);
+                router.push(`/proposal?id=${proposalId}&name=${name}&address=${safeAddress}&chainId=${chainId}`)
+            }, 1500)
+        } catch (error: any) {
+            console.log("ERROR in handleSubmit: ", error);
+            showNotification({
+                title: "Failed",
+                message: error.message,
+                color: "red",
+                autoClose: false,
+            })
+        }
+        setSubmitting(false);
+    }
+
+    const handleOriginSubmit = async (values: { address: string, chain: string }) => {
+        setSubmitting(true);
+        try {
+            const res = await createMultiSigProposal({
+                title: "Add Origin",
+                description: "Adding origin in cross-chain connext-zodiac module.",
+                creator: safeContext.safeAuthSignInResponse?.eoa!,
+                multiSigId: router.query.address as `0x${string}`,
+            })
+
+            const proposalId = res.response.data.id;
+            const iFace = new ethers.utils.Interface(myModuleMastercopyDeployment)
+            const data = iFace.encodeFunctionData("addOrigin", [getConnextAddress(values.chain), values.address, getDomainId(values.chain)])
+            console.log("data", data)
+            const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, moduleAddress, "0", data)
+            const response = await addTxnHash(proposalId, txHash)
+            showNotification({
+                title: "Success",
+                message: "Proposal created successfully",
+                color: "green",
+            })
+            setTimeout(() => {
+                router.push(`/proposal?id=${proposalId}&name=${name}&address=${safeAddress}&chainId=${chainId}`)
             }, 1500)
         } catch (error: any) {
             console.log("ERROR in handleSubmit: ", error);
@@ -212,6 +285,66 @@ export default function Home() {
         </Modal>
     )
 
+    const originModal = (
+        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"} returnFocus
+               title={"Add DAOasis Module Origin"}
+               styles={(theme) => ({
+                   content: {
+                       backgroundColor: theme.colors.blueTheme[2]
+                   },
+                   title: {
+                       fontFamily: "Inter",
+                       fontWeight: 600,
+                       fontSize: "1.2rem",
+                       color: theme.colors.violet[6]
+                   },
+                   header: {
+                       backgroundColor: theme.colors.blueTheme[2],
+                       color: theme.colors.violet[6]
+                   }
+               })}>
+            <Text italic color="#FF6B6B" fw={600} mb={"xs"}>
+                By enabling the cross-chain connext-zodiac module, the safe enabled on the other chain will be able to
+                make transactions through the current safe. It will also enable you to send wETH to this safe. If you
+                understand and are comfortable with these risks, you may proceed to enable the cross-chain
+                connext-zodiac module.
+            </Text>
+            <Text italic color="#FF6B6B" fw={600} mb={"xs"}>
+                Note: The cross-chain module supports only testnet-testnet and mainnet-mainnet interaction.
+            </Text>
+            <form onSubmit={form.onSubmit(async (values) => await handleOriginSubmit(values))}>
+                <TextInput
+                    placeholder={"Address of Safe on other chain"}
+                    label={`Address`} required
+                    {...form.getInputProps(`address`)}
+                    styles={(theme) => style(theme)}
+                />
+                <Select
+                    data={[
+                        {label: "Gnosis", value: "0x64"},
+                        {label: "Goerli", value: "0x5"},
+                        {label: "Polygon", value: "0x89"},
+                        {label: "Optimism", value: "0xa"},
+                    ]}
+                    rightSection={<IconChevronDown color="#fff" size="1rem"/>}
+                    my="sm" placeholder="Enter the chain ID" required
+                    label="Contract Chain ID" {...form.getInputProps("chainId")}
+                    styles={(theme) => selectStyle(theme)}/>
+                <Button loading={submitting} fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
+                    root: {
+                        backgroundColor: theme.colors.violet[6],
+                        "&:hover": {
+                            backgroundColor: `${theme.colors.violet[4]} !important`,
+                            color: `${theme.colors.blueTheme[1]} !important`,
+                        },
+                    }
+                })}>
+                    Enable Safe Module
+                </Button>
+            </form>
+        </Modal>
+    )
+
     return (
         <Layout>
             <Head>
@@ -233,7 +366,7 @@ export default function Home() {
                         balance={balance}
                         description={description}
                         threshold={threshold}
-                        buttonText={"Add Module"}
+                        buttonText={proposalState ? proposalState.isSuccessful ? "Add Origin" : proposalState.isExecuted ? "Add Module" : "Check Module Proposal" : "Add Module"}
                         handleClick={handleClick}
                     />
                     <CustomSkeleton
@@ -259,12 +392,12 @@ export default function Home() {
                         radius="md"
                         height={"100%"}
                     >
-                        {!loading && <ProposalTable data={proposals!} name={name} chainId={chainId}
-                                                    safeAddress={router.query.address as string}/>}
+                        {!loading && <ProposalTable data={proposals!} name={name} chainId={chainId} safeAddress={router.query.address as string}/>}
                     </CustomSkeleton>
                 </SimpleGrid>
             </Center>
             {modal}
+            {originModal}
         </Layout>
     );
 }

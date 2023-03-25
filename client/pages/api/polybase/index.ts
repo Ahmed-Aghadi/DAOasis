@@ -441,7 +441,18 @@ export default async function handler(
             res.status(200).json({ response: recordData });
             return;
         } else if (req.body.collection === "MultiSig") {
-            const { name, description, owners, threshold } = req.body;
+            const { name, description, owners, threshold, moduleAddress, moduleProposalId } = req.body;
+            if (
+                body.hasOwnProperty("moduleAddress") &&
+                body.hasOwnProperty("moduleProposalId")
+            ) {
+                const recordData = await db
+                    .collection("MultiSig")
+                    .record(id as string)
+                    .call("addModule", [moduleAddress, moduleProposalId]);
+                res.status(200).json({ response: recordData });
+                return;
+            }
             if (body.hasOwnProperty("threshold")) {
                 const recordData = await db
                     .collection("MultiSig")
@@ -476,25 +487,12 @@ export default async function handler(
                 transactionHash,
                 description,
                 creator,
-                moduleAddress,
-                moduleProposalId,
             } = req.body;
             if (body.hasOwnProperty("transactionHash")) {
                 const recordData = await db
                     .collection("MultiSigProposals")
                     .record(id as string)
                     .call("addTransactionHash", [transactionHash]);
-                res.status(200).json({ response: recordData });
-                return;
-            }
-            if (
-                body.hasOwnProperty("moduleAddress") &&
-                body.hasOwnProperty("moduleProposalId")
-            ) {
-                const recordData = await db
-                    .collection("MultiSigProposals")
-                    .record(id as string)
-                    .call("addModule", [moduleAddress, moduleProposalId]);
                 res.status(200).json({ response: recordData });
                 return;
             }

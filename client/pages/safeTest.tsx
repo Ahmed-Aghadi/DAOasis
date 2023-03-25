@@ -74,21 +74,21 @@ export default function Home() {
         const { signer, safe, service } = await getSafeService();
 
         // Create transaction
-        const safeTransactionData: SafeTransactionDataPartial = {
-            to: "0x4CA5FE129837E965e49b507cfE36c0dc574e8864",
-            value: ethers.utils.parseEther("0.001").toString(),
-            data: "0x",
-            operation: OperationType.Call,
-        };
-        // const safeTransactionData = enableSafeModule(
-        //     safeAddress,
-        //     "0x464e3F471628E162FA34F130F4C3bCC41fF7635d",
-        //     ethers.getDefaultProvider(getRpc("0x5")),
-        //     "0x1A4"
-        // );
+        // const safeTransactionData: SafeTransactionDataPartial = {
+        //     to: "0x4CA5FE129837E965e49b507cfE36c0dc574e8864",
+        //     value: ethers.utils.parseEther("0.001").toString(),
+        //     data: "0x",
+        //     operation: OperationType.Call,
+        // };
+        const safeTransactionData = enableSafeModule(
+            safeAddress,
+            "0x464e3F471628E162FA34F130F4C3bCC41fF7635d",
+            ethers.getDefaultProvider(getRpc("0x5")),
+            "0x1A4"
+        );
         console.log("safeTransactionData", safeTransactionData);
         const safeTransaction = await safe.createTransaction({
-            safeTransactionData,
+            safeTransactionData: safeTransactionData.safeTransactionData,
         });
 
         const senderAddress = await signer.getAddress();

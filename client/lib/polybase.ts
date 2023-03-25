@@ -159,10 +159,12 @@ export const addTxnHash = async (id: string, transactionHash: string) => {
 
 export const addModule = async (
     moduleAddress: string,
-    moduleProposalId: string
+    moduleProposalId: string,
+    safeAddress: string
 ) => {
     const response = await axios.patch(`/api/polybase`, {
         collection: "MultiSig",
+        id: safeAddress,
         moduleProposalId,
         moduleAddress,
     });

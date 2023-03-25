@@ -139,8 +139,9 @@ export default function ProposalAction({transactionHash, chainId, multiSigId}: P
                     proposalState?.dataDecoded && (
                         <>
                             <Text color="#CC5DE8" size="lg">Method: {proposalState?.dataDecoded.method}</Text>
-                            <Text color="#CC5DE8"
-                                  size="lg">
+                            <Text color="#CC5DE8" size="lg" sx={{
+                                wordWrap: "break-word",
+                            }}>
                                 Parameters: {proposalState?.dataDecoded.parameters.map((param: any) => {
                                     return `${param.name}(${param.type}): ${param.value},`
                                 }

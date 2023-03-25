@@ -3,7 +3,7 @@ import EthersAdapter from "@safe-global/safe-ethers-lib";
 import Safe from "@safe-global/safe-core-sdk";
 import SafeServiceClient from "@safe-global/safe-service-client";
 import {getTxService} from "@/lib/getTxService";
-import {OperationType, SafeTransactionDataPartial} from "@safe-global/safe-core-sdk-types";
+import {MetaTransactionData, OperationType, SafeTransactionDataPartial} from "@safe-global/safe-core-sdk-types";
 import {SafeEventEmitterProvider} from "@web3auth/base";
 
 export const getSafeService = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string) => {
@@ -40,6 +40,31 @@ export const getSafeService = async (provider_: SafeEventEmitterProvider, safeAd
         service,
     };
 };
+
+export const proposeModuleTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, safeTransactionData:  MetaTransactionData[]) => {
+    const { signer, safe, service } = await getSafeService(provider_, safeAddress, chainId);
+
+    const safeTransaction = await safe.createTransaction({safeTransactionData});
+
+    const senderAddress = await signer.getAddress();
+    const safeTxHash = await safe.getTransactionHash(safeTransaction);
+    const signature = await safe.signTransactionHash(safeTxHash);
+
+    // Propose transaction to the service
+    const txHash = await service.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash,
+        senderAddress,
+        senderSignature: signature.data,
+    });
+
+    console.log("Proposed a transaction with Safe:", safeAddress);
+    console.log("- safeTxHash:", safeTxHash);
+    console.log("- Sender:", senderAddress);
+    console.log("- Sender signature:", signature.data);
+    return safeTxHash;
+}
 
 export const proposeTransaction = async ( provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, to: string, value: string, data: string, operation?: number) => {
     const { signer, safe, service } = await getSafeService(provider_, safeAddress, chainId);
