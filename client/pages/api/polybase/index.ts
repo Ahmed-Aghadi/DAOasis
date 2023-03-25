@@ -63,6 +63,8 @@ const schema = `
         name: string; 
         description: string;
         chainId: string;
+        moduleAddress?: string;
+        moduleProposalId?: string;
 
         constructor (id: string, owners: string[], name: string, description: string, threshold: number, chainId: string) {
             this.id = id;
@@ -84,6 +86,11 @@ const schema = `
         
         function updateThreshold( newThreshold : number) {
           this.threshold = newThreshold;
+        }
+
+        function addModule(moduleAddress: string, moduleProposalId: string) {
+            this.moduleAddress = moduleAddress;
+            this.moduleProposalId = moduleProposalId;
         }
     }
 
@@ -465,12 +472,29 @@ export default async function handler(
             res.status(200).json({ response: recordData });
             return;
         } else if (req.body.collection === "MultiSigProposals") {
-            const { transactionHash, description, creator } = req.body;
+            const {
+                transactionHash,
+                description,
+                creator,
+                moduleAddress,
+                moduleProposalId,
+            } = req.body;
             if (body.hasOwnProperty("transactionHash")) {
                 const recordData = await db
                     .collection("MultiSigProposals")
                     .record(id as string)
                     .call("addTransactionHash", [transactionHash]);
+                res.status(200).json({ response: recordData });
+                return;
+            }
+            if (
+                body.hasOwnProperty("moduleAddress") &&
+                body.hasOwnProperty("moduleProposalId")
+            ) {
+                const recordData = await db
+                    .collection("MultiSigProposals")
+                    .record(id as string)
+                    .call("addModule", [moduleAddress, moduleProposalId]);
                 res.status(200).json({ response: recordData });
                 return;
             }
