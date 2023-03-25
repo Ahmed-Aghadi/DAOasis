@@ -15,12 +15,15 @@ import {showNotification} from "@mantine/notifications";
 import {style} from "@/components/CreateProposalTxn";
 import {IconChevronDown} from "@tabler/icons-react";
 import {selectStyle} from "@/pages/create-app";
+import axios from "axios";
 
 export default function Dashboard() {
     const [balance, setBalance] = useState("0.00")
     const [loading, setLoading] = useState(true)
     const [modalOpened, setModalOpened] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [tokens, setTokens] = useState<any[]>([])
+    const [txns, setTxns] = useState<any[]>([])
 
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
@@ -28,6 +31,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (!safeContext.safeAuth) return;
         getBalance()
+        getTokensAndTxns()
     }, [safeContext.safeAuth])
 
     const getBalance = async () => {
@@ -39,6 +43,18 @@ export default function Dashboard() {
         setLoading(false)
     }
 
+    const getTokensAndTxns = async () => {
+        const res = await axios.post("/api/getAddressInfo", {
+            chainId: safeContext.safeAuthSignInResponse?.chainId,
+            address: safeContext.safeAuthSignInResponse?.eoa
+        })
+        setTokens(res.data.tokens)
+        const txns = [...res.data.incomingTxn, ...res.data.outgoingTxn]
+        setTxns(txns)
+    }
+
+    console.log("TOKENS: ", tokens)
+    console.log("TXNS: ", txns)
 
     const handleClick = () => {
         setModalOpened(true);

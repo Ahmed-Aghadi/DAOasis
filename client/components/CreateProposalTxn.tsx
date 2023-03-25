@@ -281,7 +281,7 @@ export default function CreateProposalTxn() {
             <StyledAccordion defaultValue={"txn"}>
                 <Accordion.Item value={"txn"}>
                     <Accordion.Control>
-                        <Title color="#AE3EC9">Proposal Txn</Title>
+                        <Title color="#AE3EC9">Create Proposal Transaction</Title>
                     </Accordion.Control>
                     <Accordion.Panel>
                         <Text color="#CC5DE8">
