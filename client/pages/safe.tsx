@@ -142,6 +142,7 @@ export default function Home() {
                 ethers.utils.isAddress(value!)
                     ? undefined
                     : "Invalid address",
+            chain: (value) => value ? undefined : "Invalid chain",
         },
         validateInputOnChange: true,
     });

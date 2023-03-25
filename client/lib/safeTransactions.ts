@@ -41,7 +41,7 @@ export const getSafeService = async (provider_: SafeEventEmitterProvider, safeAd
     };
 };
 
-export const proposeModuleTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, safeTransactionData:  MetaTransactionData[]) => {
+export const proposeModuleTransaction = async (provider_: SafeEventEmitterProvider, safeAddress: string, chainId: string, safeTransactionData:  SafeTransactionDataPartial | MetaTransactionData[]) => {
     const { signer, safe, service } = await getSafeService(provider_, safeAddress, chainId);
 
     const safeTransaction = await safe.createTransaction({safeTransactionData});

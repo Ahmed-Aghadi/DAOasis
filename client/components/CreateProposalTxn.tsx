@@ -1,14 +1,17 @@
-import {Title, Text, TextInput, Textarea, Select, Button, Accordion} from "@mantine/core";
-import {useContext, useState} from "react";
+import {Title, Text, TextInput, Textarea, Select, Button, Accordion, Checkbox} from "@mantine/core";
+import React, {useContext, useEffect, useState} from "react";
 import {useForm} from "@mantine/form";
 import {ethers} from "ethers";
 import {parseAbiToFunction} from "@/lib/abiParse";
 import StyledAccordion from "@/components/StyledAccordion";
 import safeAuthContext from "@/contexts/SafeAuthContext";
-import {proposeTransaction} from "@/lib/safeTransactions";
+import {proposeModuleTransaction, proposeTransaction} from "@/lib/safeTransactions";
 import {useRouter} from "next/router";
-import {addTxnHash} from "@/lib/polybase";
+import {addTxnHash, getSafe} from "@/lib/polybase";
 import {showNotification} from "@mantine/notifications";
+import {IconChevronDown} from "@tabler/icons-react";
+import {selectStyle} from "@/pages/create-app";
+import {getCrossChainTransaction} from "@/lib/getCrossChainTransaction";
 
 export const style = (theme: any) => ({
     input: {
@@ -34,6 +37,7 @@ export default function CreateProposalTxn() {
     const safeContext = useContext(safeAuthContext)
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [moduleAddress, setModuleAddress] = useState<string>("")
 
     const [selectData, setSelectData] = useState<any[]>([]);
     const [selectedFunctionComponent, setSelectedFunctionComponent] = useState<any>(null);
@@ -45,12 +49,19 @@ export default function CreateProposalTxn() {
             abi: "",
             value: "0",
             args: [],
+            enable: false,
+            chainId: "",
+            safeAddress: "",
+            amountWeth: "0",
         },
         validate: {
             contractAddress: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
             abi: (value) => validateAbiInput(value) ? undefined : "Invalid ABI",
             functionName: (value) => handleSelectChange(value) ? undefined : "Select a function",
             value: (value) => /[0-9]*\.[0-9]+/i.test(value) ? "Invalid value" : undefined,
+            safeAddress: (value, values) => values.enable ? ethers.utils.isAddress(value!) ? undefined : "Invalid address" : undefined,
+            chainId: (value, values) => values.enable ? value ? undefined : "Invalid chain" : undefined,
+            amountWeth: (value) => /[0-9]*\.[0-9]+/i.test(value) ? "Invalid value" : undefined,
         },
         validateInputOnChange: true,
     })
@@ -112,20 +123,27 @@ export default function CreateProposalTxn() {
                 args_[i] = parseInt(values.args[i])
             }
         }
-        try{
+        try {
             const parsedAbi = parseAbiToFunction(values.abi).functionAbi;
-        const iFace = new ethers.utils.Interface([parsedAbi[values.functionName]])
-        const data = iFace.encodeFunctionData(func.name, args_)
-        console.log("data", data)
-        const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, values.contractAddress, values.value, data)
-        const response = await addTxnHash(router.query.id as string, txHash)
-        console.log(response)
-        setLoading(false)
-        setTimeout(() => {
-            router.back()
-        }, 1500)
+            const iFace = new ethers.utils.Interface([parsedAbi[values.functionName]])
+            const data = iFace.encodeFunctionData(func.name, args_)
+            console.log("data", data)
 
-        } catch (e: any){
+            if (values.enable) {
+                const amount = ethers.utils.parseEther(values.amountWeth).toString()
+                const safeTransactionData = await getCrossChainTransaction(router.query.address as string, router.query.chainId as string, values.chainId, amount, "1000", values.safeAddress, values.chainId === "0x5" ? "testnet" : "mainnet", values.contractAddress, values.value, data, "CALL")
+                const txHash = await proposeModuleTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, safeTransactionData)
+                await addTxnHash(router.query.id as string, txHash)
+            } else {
+                const txHash = await proposeTransaction(safeContext.provider!, router.query.address as string, router.query.chainId as string, values.contractAddress, values.value, data)
+                const response = await addTxnHash(router.query.id as string, txHash)
+            }
+            setLoading(false)
+            setTimeout(() => {
+                router.back()
+            }, 1500)
+
+        } catch (e: any) {
             console.log(e)
             showNotification({
                 title: "Error",
@@ -210,6 +228,46 @@ export default function CreateProposalTxn() {
                                     <TextInput my="sm" placeholder="Enter the value" required
                                                label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" {...txnProposalForm.getInputProps("value")}
                                                styles={(theme) => style(theme)}/>
+                                    <Checkbox {...txnProposalForm.getInputProps("enable")}
+                                              label="Cross Chain Transaction" styles={(theme => ({
+                                        label: {
+                                            color: theme.colors.blueTheme[4],
+                                        },
+                                        input: {
+                                            backgroundColor: theme.colors.blueTheme[3],
+                                            "&:checked": {
+                                                backgroundColor: theme.colors.blueTheme[0],
+                                                borderColor: theme.colors.blueTheme[0],
+                                            }
+                                        }
+                                    }))}/>
+                                    {
+                                        txnProposalForm.values.enable && (
+                                            <>
+                                                <TextInput
+                                                    placeholder={"Address of Cross Chain Module of Safe on other chain"}
+                                                    label={`Address`} required
+                                                    {...txnProposalForm.getInputProps(`safeAddress`)}
+                                                    styles={(theme) => style(theme)}
+                                                />
+                                                <Select
+                                                    data={[
+                                                        {label: "Gnosis", value: "0x64"},
+                                                        {label: "Goerli", value: "0x5"},
+                                                        {label: "Polygon", value: "0x89"},
+                                                        {label: "Optimism", value: "0xa"},
+                                                    ]}
+                                                    rightSection={<IconChevronDown color="#fff" size="1rem"/>}
+                                                    my="sm" placeholder="Enter the chain ID" required
+                                                    label="Contract Chain ID" {...txnProposalForm.getInputProps("chainId")}
+                                                    styles={(theme) => selectStyle(theme)}/>
+                                                <TextInput my="sm" placeholder="Enter the amount of wETH to send to safe"
+                                                           required
+                                                           label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" {...txnProposalForm.getInputProps("amountWeth")}
+                                                           styles={(theme) => style(theme)}/>
+                                            </>
+                                        )
+                                    }
                                     <Button loading={loading} fullWidth type="submit" color="red" mt="md"
                                             styles={(theme) => ({
                                                 root: {

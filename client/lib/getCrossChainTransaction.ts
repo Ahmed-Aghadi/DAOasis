@@ -9,12 +9,12 @@ import {
 } from "@safe-global/safe-core-sdk-types";
 
 export async function getCrossChainTransaction(
-    signer: ethers.Signer,
+    safeAddress: string,
     chainId: string, // current chain (source chain)
     chainId1: string, // destination chain
     amount: string, // amount to transfer (will be converted to weth on source chain)
     slippage: string, // example: 1000 = 10%
-    safeAddress1: string, // safe address to send funds to on destination chain
+    safeModuleAddress1: string, // safe address to send funds to on destination chain
     network: "mainnet" | "testnet",
     toAddress: string, // address to call on destination chain ( cross chain transaction )
     value: string, // value to send while doing cross chain transaction on toAddress ( don't parseEther as it will be done in the function )
@@ -22,10 +22,10 @@ export async function getCrossChainTransaction(
     operation: "CALL" | "DELEGATECALL", // operation to do while doing cross chain transaction on toAddress
     approveInfiniteAmount: boolean = true // approve infinite amount of weth on source chain
 ) {
-    const signerAddress = await signer.getAddress();
+    // const signerAddress = await signer.getAddress();
 
     const sdkConfig: SdkConfig = {
-        signerAddress: signerAddress,
+        signerAddress: safeAddress,
         // Use `mainnet` when you're ready...
         network: network,
         // Add more chains here! Use mainnet domains if `network: mainnet`
@@ -75,14 +75,16 @@ export async function getCrossChainTransaction(
     const xcallParams = {
         origin: originDomain, // send from Source Domain
         destination: destinationDomain, // to Destination Domain
-        to: safeAddress1, // the address that should receive the funds on destination
+        to: safeModuleAddress1, // the address that should receive the funds on destination
         asset: originAsset, // address of the token contract
-        delegate: "''''", // address allowed to execute transaction on destination side in addition to relayers
+        delegate: safeModuleAddress1, // address allowed to execute transaction on destination side in addition to relayers
         amount: amount, // amount of tokens to transfer
         slippage: slippage, // the maximum amount of slippage the user will accept in BPS (e.g. 30 = 0.3%)
         callData: callData, // empty calldata for a simple transfer (byte-encoded)
         relayerFee: relayerFee, // fee paid to relayers
     };
+
+    console.log("xcallParams", xcallParams);
 
     // Approve the asset transfer if the current allowance is lower than the amount.
     // Necessary because funds will first be sent to the Connext contract in xcall.
@@ -93,11 +95,13 @@ export async function getCrossChainTransaction(
         approveInfiniteAmount
     );
 
+    console.log("approveTxReq", approveTxReq);
+
     // maybe here's a mistake
     const approveTxReqTransactionData = {
-        to: approveTxReq!.to!,
-        value: approveTxReq!.value ? approveTxReq!.value.toString() : "0",
-        data: approveTxReq!.data ? approveTxReq!.data.toString() : "0x",
+        to: approveTxReq?.to!,
+        value: approveTxReq?.value ? approveTxReq!.value.toString() : "0",
+        data: approveTxReq?.data ? approveTxReq!.data.toString() : "0x",
     };
 
     // let safeTransactionData: SafeTransactionDataPartial = {
@@ -121,6 +125,7 @@ export async function getCrossChainTransaction(
 
     // Send the xcall
     const xcallTxReq = await sdkBase.xcall(xcallParams);
+    console.log("xcallTxReq", xcallTxReq);
     const xcallTxTransactionData = {
         to: xcallTxReq.to!,
         value: xcallTxReq.value ? xcallTxReq.value.toString() : "0",
