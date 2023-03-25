@@ -157,6 +157,21 @@ export const addTxnHash = async (id: string, transactionHash: string) => {
     return response.data;
 };
 
+export const addModule = async (
+    moduleAddress: string,
+    moduleProposalId: string
+) => {
+    const response = await axios.patch(`/api/polybase`, {
+        collection: "MultiSig",
+        moduleProposalId,
+        moduleAddress,
+    });
+    if (response.status !== 200) {
+        throw new Error("Error adding module");
+    }
+    return response.data;
+};
+
 export const getProfile = async (id: Profile["id"]) => {
     console.log("id", id);
     const response = await axios.get(`/api/polybase`, {
