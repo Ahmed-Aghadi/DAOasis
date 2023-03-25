@@ -12,7 +12,7 @@ import {uploadImage} from "@/lib/uploadImage";
 import {showNotification} from "@mantine/notifications";
 import {createApp} from "@/lib/polybase";
 
-const selectStyle = (theme: any) => ({
+export const selectStyle = (theme: any) => ({
     input: {
         backgroundColor: theme.colors.blueTheme[3],
         borderRadius: "0.5rem",

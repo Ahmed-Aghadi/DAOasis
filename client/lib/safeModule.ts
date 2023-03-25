@@ -70,5 +70,5 @@ export function enableSafeModule(
         deployModuleTransaction,
         enableModuleTransactionData,
     ];
-    return safeTransactionData;
+    return {safeTransactionData, expectedModuleAddress};
 }

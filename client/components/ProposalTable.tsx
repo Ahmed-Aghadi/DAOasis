@@ -219,27 +219,27 @@ export function ProposalTable({data, name, safeAddress, chainId}: TableSortProps
                     Create a new proposal
                 </Button>
             </Group>
-            <ScrollArea h={360}>
-                <TextInput
-                    placeholder="Search by any field"
-                    mb="md"
-                    icon={<IconSearch size="0.9rem" stroke={1.5} color={"#3304ba"}/>}
-                    value={search}
-                    onChange={handleSearchChange}
-                    styles={{
-                        input: {
-                            backgroundColor: "#eeebf7",
-                            borderRadius: "0.5rem",
-                            color: "#3304ba",
-                            "&:focus": {
-                                borderColor: "#3304ba",
-                            },
-                            "&::placeholder": {
-                                color: "#3304ba",
-                            }
+            <TextInput
+                placeholder="Search by any field"
+                mb="md"
+                icon={<IconSearch size="0.9rem" stroke={1.5} color={"#3304ba"}/>}
+                value={search}
+                onChange={handleSearchChange}
+                styles={{
+                    input: {
+                        backgroundColor: "#eeebf7",
+                        borderRadius: "0.5rem",
+                        color: "#3304ba",
+                        "&:focus": {
+                            borderColor: "#3304ba",
                         },
-                    }}
-                />
+                        "&::placeholder": {
+                            color: "#3304ba",
+                        }
+                    },
+                }}
+            />
+            <ScrollArea h={360}>
                 {rows.length === 0 && (
                     <Center>
                         <div>

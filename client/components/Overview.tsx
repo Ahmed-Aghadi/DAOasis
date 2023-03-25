@@ -24,9 +24,11 @@ export type OverviewProps = {
     balance: string
     description?: string
     threshold?: number
+    buttonText: string
+    handleClick : () => void
 }
 
-export default function Overview({loading, address, name, chainId, balance, description, threshold}: OverviewProps) {
+export default function Overview({loading, address, name, chainId, balance, description, threshold, buttonText, handleClick}: OverviewProps) {
     return (
         <CustomSkeleton visible={loading}>
             <Paper p="xl" bg="#c4b7eb" sx={{height: "100%"}}>
@@ -66,6 +68,7 @@ export default function Overview({loading, address, name, chainId, balance, desc
                         </Tooltip>
                     </ActionIcon>
                 </Group>
+                <Group position="apart">
                 <Flex direction="column" mx={"md"} my={"sm"} p={"sm"}>
                     <Text color="#E9ECEF">Balance</Text>
                     <Text
@@ -73,6 +76,14 @@ export default function Overview({loading, address, name, chainId, balance, desc
                         style={{fontWeight: 700}}>{parseFloat(balance).toFixed(2)}</span> {getChainDetails(chainId).token}
                     </Text>
                 </Flex>
+                    <Button onClick={handleClick} radius="sm" variant="filled" bg="#D6336C" sx={{
+                        "&:hover": {
+                            backgroundColor: "#F06595 !important"
+                        }
+                    }}>
+                        {buttonText}
+                    </Button>
+                </Group>
             </Paper>
         </CustomSkeleton>
     )
