@@ -1,5 +1,5 @@
-import { useForm } from "@mantine/form";
-import { ethers } from "ethers";
+import {useForm} from "@mantine/form";
+import {ethers} from "ethers";
 import {
     ActionIcon,
     Button,
@@ -9,13 +9,14 @@ import {
     Textarea,
     TextInput,
 } from "@mantine/core";
-import { IconTrash } from "@tabler/icons-react";
+import {IconTrash} from "@tabler/icons-react";
 import SafeAuthContext from "@/contexts/SafeAuthContext";
-import { useContext } from "react";
+import {useContext, useState} from "react";
 import axios from "axios";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { createSafe } from "@/lib/polybase";
-import PolybaseContext, { MultiSig } from "@/contexts/PolybaseContext";
+import {showNotification, updateNotification} from "@mantine/notifications";
+import {createSafe} from "@/lib/polybase";
+import PolybaseContext, {MultiSig} from "@/contexts/PolybaseContext";
+import {useRouter} from "next/router";
 
 const style = (theme: any) => ({
     input: {
@@ -38,11 +39,15 @@ const style = (theme: any) => ({
 export default function CreateSafeForm() {
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
+    const router = useRouter();
+
+    const [submitting, setSubmitting] = useState(false);
+
     const form = useForm({
         initialValues: {
             name: "",
             description: "",
-            owners: [{ address: safeContext.safeAuthSignInResponse?.eoa }],
+            owners: [{address: safeContext.safeAuthSignInResponse?.eoa}],
             threshold: 1,
         },
         validate: {
@@ -62,6 +67,7 @@ export default function CreateSafeForm() {
         owners: { address: string | undefined }[];
         threshold: number;
     }) => {
+        setSubmitting(true)
         showNotification({
             id: "create-safe",
             title: "Creating Safe...",
@@ -101,6 +107,10 @@ export default function CreateSafeForm() {
                 autoClose: true,
                 color: "green",
             });
+            setSubmitting(false)
+            setTimeout(() => {
+                router.push(`/safe?address=${safeAddress}`);
+            }, 1500)
         } catch (e) {
             console.log(e);
             updateNotification({
@@ -110,6 +120,7 @@ export default function CreateSafeForm() {
                 autoClose: true,
                 color: "red",
             });
+            setSubmitting(false)
         }
     };
 
@@ -119,6 +130,9 @@ export default function CreateSafeForm() {
                 async (values) => await handleFormSubmit(values)
             )}
         >
+            <Text size="sm" color="#B197FC">
+                Don't worry, we'll cover the gas fees for you! 😉
+            </Text>
             <TextInput
                 placeholder={"Name of the Safe"}
                 label="Name"
@@ -171,7 +185,7 @@ export default function CreateSafeForm() {
                                     form.removeListItem(`owners`, index);
                                 }}
                             >
-                                <IconTrash />
+                                <IconTrash/>
                             </ActionIcon>
                         </Grid.Col>
                     </Grid>
@@ -179,7 +193,7 @@ export default function CreateSafeForm() {
             })}
             <Button
                 onClick={() => {
-                    form.insertListItem(`owners`, { address: "" });
+                    form.insertListItem(`owners`, {address: ""});
                 }}
                 styles={(theme) => ({
                     root: {
@@ -193,8 +207,8 @@ export default function CreateSafeForm() {
             >
                 Add owner
             </Button>
-            <br />
-            <Button fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
+            <br/>
+            <Button loading={submitting} fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
                 root: {
                     backgroundColor: theme.colors.violet[6],
                     "&:hover": {

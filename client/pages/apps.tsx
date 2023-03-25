@@ -1,6 +1,6 @@
 import {Layout} from "@/components/Layout";
 import Head from "next/head";
-import {Grid, Group, Text, Title} from "@mantine/core";
+import {Center, Grid, Group, Text, Title} from "@mantine/core";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 import {getApps} from "@/lib/polybase";
@@ -26,21 +26,23 @@ export default function Home() {
                     <Text underline color="grape">Create App</Text>
                 </Link>
             </Group>
-            <Grid align="stretch" gutter="md" m="xs">
-                {appsData?.map((app: any, index: number) => {
-                    return (
-                        <Grid.Col key={index} xl={4} lg={4} md={6} sm={6}>
-                            <AppCard
-                                name={app.data.name}
-                                id={app.data.id}
-                                description={app.data.description}
-                                image={app.data.imageCid}
-                                chainId={app.data.chainId}
-                            />
-                        </Grid.Col>
-                    )
-                })}
-            </Grid>
+            <Center>
+                <Grid gutter="md" m="xs">
+                    {appsData?.map((app: any, index: number) => {
+                        return (
+                            <Grid.Col key={index} xl={4} lg={4} md={6} sm={6}>
+                                <AppCard
+                                    name={app.data.name}
+                                    id={app.data.id}
+                                    description={app.data.description}
+                                    image={app.data.imageCid}
+                                    chainId={app.data.chainId}
+                                />
+                            </Grid.Col>
+                        )
+                    })}
+                </Grid>
+            </Center>
         </Layout>
     )
 }

@@ -1,11 +1,11 @@
-import { Layout } from "@/components/Layout";
+import {Layout} from "@/components/Layout";
 import Head from "next/head";
 import {
     Anchor,
     Avatar,
     Breadcrumbs,
     Button,
-    Center,
+    Center, Container,
     Group,
     Paper,
     Tabs,
@@ -13,10 +13,10 @@ import {
     Textarea,
     Title,
 } from "@mantine/core";
-import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
-import { addReply, getMultiSigProposal } from "@/lib/polybase";
-import { StyledTabs } from "@/components/StyledTabs";
+import {useRouter} from "next/router";
+import React, {useContext, useEffect, useState} from "react";
+import {addReply, getMultiSigProposal} from "@/lib/polybase";
+import {StyledTabs} from "@/components/StyledTabs";
 import ViewReply from "@/components/ViewReply";
 import CreateProposalTxn from "@/components/CreateProposalTxn";
 import ProposalAction from "@/components/ProposalActions";
@@ -92,102 +92,104 @@ export default function Home() {
             <Head>
                 <title>Create Proposal</title>
             </Head>
-            <Breadcrumbs>{items}</Breadcrumbs>
-            <Title color="#AE3EC9">{proposalData?.title}</Title>
-            <Text color="#CC5DE8">{proposalData?.description}</Text>
-            <StyledTabs defaultValue="discussions">
-                <Tabs.List my={"md"}>
-                    <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
-                    <Tabs.Tab value="proposals">Contract Proposal</Tabs.Tab>
-                </Tabs.List>
-                <Tabs.Panel value={"discussions"}>
-                    <form
-                        style={{ position: "relative" }}
-                        onSubmit={async (e: any) => {
-                            e.preventDefault();
-                            setSendingReply(true);
-                            try {
-                                const content = e.target[0].value;
-                                const creator =
-                                    safeContext.safeAuthSignInResponse?.eoa;
-                                const multiSigId = router.query.id as string;
-                                const data = await addReply({
-                                    collection: "MultiSigProposals",
-                                    id: multiSigId,
-                                    description: content,
-                                    creator: creator!,
-                                });
-                                setProposalData(data.response.data);
-                                e.target[0].value = "";
-                            } catch (e) {
-                                console.log(e);
-                            }
-                            setSendingReply(false);
-                        }}
-                    >
-                        <Textarea
-                            placeholder={"What's on Your Mind?"}
-                            required
-                            minRows={5}
-                            styles={(theme) => style(theme)}
-                        />
-                        <Button
-                            radius="lg"
-                            type="submit"
-                            loading={sendingReply}
-                            sx={(theme) => ({
-                                position: "absolute",
-                                right: "0",
-                                bottom: "0",
-                                margin: theme.spacing.md,
-                                backgroundColor: theme.colors.blueTheme[0],
-                                "&:hover": {
-                                    backgroundColor: `${theme.colors.blueTheme[4]} !important`,
-                                },
-                            })}
+            <Container>
+                <Breadcrumbs>{items}</Breadcrumbs>
+                <Title color="#AE3EC9">{proposalData?.title}</Title>
+                <Text color="#CC5DE8">{proposalData?.description}</Text>
+                <StyledTabs defaultValue="discussions">
+                    <Tabs.List my={"md"}>
+                        <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
+                        <Tabs.Tab value="proposals">Contract Proposal</Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value={"discussions"}>
+                        <form
+                            style={{position: "relative"}}
+                            onSubmit={async (e: any) => {
+                                e.preventDefault();
+                                setSendingReply(true);
+                                try {
+                                    const content = e.target[0].value;
+                                    const creator =
+                                        safeContext.safeAuthSignInResponse?.eoa;
+                                    const multiSigId = router.query.id as string;
+                                    const data = await addReply({
+                                        collection: "MultiSigProposals",
+                                        id: multiSigId,
+                                        description: content,
+                                        creator: creator!,
+                                    });
+                                    setProposalData(data.response.data);
+                                    e.target[0].value = "";
+                                } catch (e) {
+                                    console.log(e);
+                                }
+                                setSendingReply(false);
+                            }}
                         >
-                            Comment
-                        </Button>
-                    </form>
-                    {proposalData?.replies
-                        .slice(0)
-                        .reverse()
-                        .map((reply, index) => (
-                            <ViewReply
-                                key={index}
-                                collectionId={reply.collectionId}
-                                id={reply.id}
+                            <Textarea
+                                placeholder={"What's on Your Mind?"}
+                                required
+                                minRows={5}
+                                styles={(theme) => style(theme)}
                             />
-                        ))}
-                    {proposalData?.replies.length === 0 && (
-                        <Paper my="md" p="md" bg="#e1dbf5" radius="lg">
-                            <Text color="#CC5DE8" size="lg">
-                                No conversations here yet. Be the first to chat!
-                            </Text>
+                            <Button
+                                radius="lg"
+                                type="submit"
+                                loading={sendingReply}
+                                sx={(theme) => ({
+                                    position: "absolute",
+                                    right: "0",
+                                    bottom: "0",
+                                    margin: theme.spacing.md,
+                                    backgroundColor: theme.colors.blueTheme[0],
+                                    "&:hover": {
+                                        backgroundColor: `${theme.colors.blueTheme[4]} !important`,
+                                    },
+                                })}
+                            >
+                                Comment
+                            </Button>
+                        </form>
+                        {proposalData?.replies
+                            .slice(0)
+                            .reverse()
+                            .map((reply, index) => (
+                                <ViewReply
+                                    key={index}
+                                    collectionId={reply.collectionId}
+                                    id={reply.id}
+                                />
+                            ))}
+                        {proposalData?.replies.length === 0 && (
+                            <Paper my="md" p="md" bg="#e1dbf5" radius="lg">
+                                <Text color="#CC5DE8" size="lg">
+                                    No conversations here yet. Be the first to chat!
+                                </Text>
+                            </Paper>
+                        )}
+                    </Tabs.Panel>
+                    <Tabs.Panel value={"proposals"}>
+                        <Paper my="md" p="md" bg="#eeebf7" radius="lg">
+                            {!proposalData?.transactionHash && (
+                                <CreateProposalTxn/>
+                            )}
+                            {proposalData?.transactionHash && (
+                                <ProposalAction
+                                    createdAt={proposalData.createdAt}
+                                    creator={proposalData.creator}
+                                    description={proposalData.description}
+                                    id={proposalData.id}
+                                    title={proposalData.title}
+                                    multiSigId={proposalData.multiSigId}
+                                    replies={proposalData.replies}
+                                    transactionHash={proposalData.transactionHash}
+                                    chainId={router?.query?.chainId as string}
+                                />
+                            )}
                         </Paper>
-                    )}
-                </Tabs.Panel>
-                <Tabs.Panel value={"proposals"}>
-                    <Paper my="md" p="md" bg="#eeebf7" radius="lg">
-                        {!proposalData?.transactionHash && (
-                            <CreateProposalTxn />
-                        )}
-                        {proposalData?.transactionHash && (
-                            <ProposalAction
-                                createdAt={proposalData.createdAt}
-                                creator={proposalData.creator}
-                                description={proposalData.description}
-                                id={proposalData.id}
-                                title={proposalData.title}
-                                multiSigId={proposalData.multiSigId}
-                                replies={proposalData.replies}
-                                transactionHash={proposalData.transactionHash}
-                                chainId={router?.query?.chainId as string}
-                            />
-                        )}
-                    </Paper>
-                </Tabs.Panel>
-            </StyledTabs>
+                    </Tabs.Panel>
+                </StyledTabs>
+            </Container>
         </Layout>
     );
 }

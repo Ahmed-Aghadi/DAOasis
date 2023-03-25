@@ -10,7 +10,7 @@ import {
     Tooltip,
     ActionIcon,
     Tabs,
-    Textarea, Button, Select, TextInput
+    Textarea, Button, Select, TextInput, Center, Container
 } from "@mantine/core";
 import {useRouter} from "next/router";
 import React, {useContext, useEffect, useState} from "react";
@@ -213,7 +213,7 @@ export default function Home() {
                 <title>DAOasis - {appData?.name}</title>
             </Head>
             <CustomSkeleton visible={fetching}>
-                <StyledTabs defaultValue="about">
+                <Container>
                     <Paper p="xl" className={classes.paper}>
                         <Image
                             mb="md"
@@ -237,129 +237,131 @@ export default function Home() {
                             </Badge>
                         </Group>
                     </Paper>
-                    <Tabs.List my={"md"} px="md">
-                        <Tabs.Tab value="about">About</Tabs.Tab>
-                        <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
-                        <Tabs.Tab value={"functions"}>Functions</Tabs.Tab>
-                    </Tabs.List>
-                    <Tabs.Panel value="about">
-                        <Paper p="md" className={classes.paper}>
-                            <Text className={classes.text} size="xl">
-                                {appData?.description}
-                            </Text>
-                        </Paper>
-                    </Tabs.Panel>
-                    <Tabs.Panel value={"discussions"}>
-                        <form
-                            style={{position: "relative"}}
-                            onSubmit={async (e: any) => {
-                                e.preventDefault();
-                                setSendingReply(true);
-                                try {
-                                    const content = e.target[0].value;
-                                    const creator =
-                                        safeContext.safeAuthSignInResponse?.eoa;
-                                    const data = await addReply({
-                                        collection: "App",
-                                        id: router?.query?.id as string,
-                                        description: content,
-                                        creator: creator!,
-                                    });
-                                    setAppData(data.response.data);
-                                    e.target[0].value = "";
-                                } catch (e) {
-                                    console.log(e);
-                                }
-                                setSendingReply(false);
-                            }}
-                        >
-                            <Textarea
-                                placeholder={"What's on Your Mind?"}
-                                required
-                                minRows={5}
-                                styles={(theme) => style(theme)}
-                            />
-                            <Button
-                                radius="lg"
-                                type="submit"
-                                loading={sendingReply}
-                                sx={(theme) => ({
-                                    position: "absolute",
-                                    right: "0",
-                                    bottom: "0",
-                                    margin: theme.spacing.md,
-                                    backgroundColor: theme.colors.blueTheme[0],
-                                    "&:hover": {
-                                        backgroundColor: `${theme.colors.blueTheme[4]} !important`,
-                                    },
-                                })}
-                            >
-                                Comment
-                            </Button>
-                        </form>
-                        {appData?.replies
-                            ?.slice(0)
-                            .reverse()
-                            .map((reply: { collectionId: string; id: string; }, index: React.Key | null | undefined) => (
-                                <ViewReply
-                                    key={index}
-                                    collectionId={reply.collectionId}
-                                    id={reply.id}
-                                />
-                            ))}
-                        {appData?.replies?.length === 0 && (
-                            <Paper my="md" p="md" bg="#e1dbf5" radius="lg">
-                                <Text color="#CC5DE8" size="lg">
-                                    No conversations here yet. Be the first to chat!
+                    <StyledTabs defaultValue="about">
+                        <Tabs.List my={"md"} px="md">
+                            <Tabs.Tab value="about">About</Tabs.Tab>
+                            <Tabs.Tab value="discussions">Discussions</Tabs.Tab>
+                            <Tabs.Tab value={"functions"}>Functions</Tabs.Tab>
+                        </Tabs.List>
+                        <Tabs.Panel value="about">
+                            <Paper p="md" className={classes.paper}>
+                                <Text className={classes.text} size="xl">
+                                    {appData?.description}
                                 </Text>
                             </Paper>
-                        )}
-                    </Tabs.Panel>
-                    <Tabs.Panel value={"functions"}>
-                        <Paper p="md" className={classes.paper}>
-                            <Group>
-                                <Text className={classes.text} size="xl">
-                                    <span style={{fontWeight: "bold"}}>Contract Address: </span>{appData?.id}
-                                </Text>
-                                <ActionIcon component={"a"} target={"_blank"}
-                                            href={`${getChainDetails(appData?.chainId!).explorer}address/${appData?.id}`}>
-                                    <Tooltip label={"View App Website"} position="top" withArrow>
-                                        <IconExternalLink color={"purple"} size="1rem"/>
-                                    </Tooltip>
-                                </ActionIcon>
-                            </Group>
-                            <form onSubmit={form.onSubmit(async (values) => handleProposalSubmit(values))}>
-                                <Select data={multiSigs} placeholder="Select a safe" required searchable
-                                        label="Select a safe"
-                                        {...form.getInputProps("safeAddress")}
-                                        styles={(theme) => selectStyle(theme)}/>
-                                <Select data={selectData} placeholder="Select a function" required searchable
-                                        label="Select a function"
-                                        {...form.getInputProps("functionName")}
-                                        styles={(theme) => selectStyle(theme)}/>
-                                {selectedFunctionComponent}
-                                {selectedFunctionComponent &&
-                                    <>
-                                        <TextInput my="sm" placeholder="Enter the value" required
-                                                   label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" {...form.getInputProps("value")}
-                                                   styles={(theme) => style(theme)}/>
-                                        <Button loading={loading} fullWidth type="submit" color="red" mt="md"
-                                                styles={(theme) => ({
-                                                    root: {
-                                                        backgroundColor: theme.colors.violet[6],
-                                                        "&:hover": {
-                                                            backgroundColor: `${theme.colors.violet[4]} !important`,
-                                                            color: `${theme.colors.blueTheme[1]} !important`,
-                                                        },
-                                                    }
-                                                })}>
-                                            Create Proposal
-                                        </Button>
-                                    </>}
+                        </Tabs.Panel>
+                        <Tabs.Panel value={"discussions"}>
+                            <form
+                                style={{position: "relative"}}
+                                onSubmit={async (e: any) => {
+                                    e.preventDefault();
+                                    setSendingReply(true);
+                                    try {
+                                        const content = e.target[0].value;
+                                        const creator =
+                                            safeContext.safeAuthSignInResponse?.eoa;
+                                        const data = await addReply({
+                                            collection: "App",
+                                            id: router?.query?.id as string,
+                                            description: content,
+                                            creator: creator!,
+                                        });
+                                        setAppData(data.response.data);
+                                        e.target[0].value = "";
+                                    } catch (e) {
+                                        console.log(e);
+                                    }
+                                    setSendingReply(false);
+                                }}
+                            >
+                                <Textarea
+                                    placeholder={"What's on Your Mind?"}
+                                    required
+                                    minRows={5}
+                                    styles={(theme) => style(theme)}
+                                />
+                                <Button
+                                    radius="lg"
+                                    type="submit"
+                                    loading={sendingReply}
+                                    sx={(theme) => ({
+                                        position: "absolute",
+                                        right: "0",
+                                        bottom: "0",
+                                        margin: theme.spacing.md,
+                                        backgroundColor: theme.colors.blueTheme[0],
+                                        "&:hover": {
+                                            backgroundColor: `${theme.colors.blueTheme[4]} !important`,
+                                        },
+                                    })}
+                                >
+                                    Comment
+                                </Button>
                             </form>
-                        </Paper>
-                    </Tabs.Panel>
-                </StyledTabs>
+                            {appData?.replies
+                                ?.slice(0)
+                                .reverse()
+                                .map((reply: { collectionId: string; id: string; }, index: React.Key | null | undefined) => (
+                                    <ViewReply
+                                        key={index}
+                                        collectionId={reply.collectionId}
+                                        id={reply.id}
+                                    />
+                                ))}
+                            {appData?.replies?.length === 0 && (
+                                <Paper my="md" p="md" bg="#e1dbf5" radius="lg">
+                                    <Text color="#CC5DE8" size="lg">
+                                        No conversations here yet. Be the first to chat!
+                                    </Text>
+                                </Paper>
+                            )}
+                        </Tabs.Panel>
+                        <Tabs.Panel value={"functions"}>
+                            <Paper p="md" className={classes.paper}>
+                                <Group>
+                                    <Text className={classes.text} size="xl">
+                                        <span style={{fontWeight: "bold"}}>Contract Address: </span>{appData?.id}
+                                    </Text>
+                                    <ActionIcon component={"a"} target={"_blank"}
+                                                href={`${getChainDetails(appData?.chainId!).explorer}address/${appData?.id}`}>
+                                        <Tooltip label={"View App Website"} position="top" withArrow>
+                                            <IconExternalLink color={"purple"} size="1rem"/>
+                                        </Tooltip>
+                                    </ActionIcon>
+                                </Group>
+                                <form onSubmit={form.onSubmit(async (values) => handleProposalSubmit(values))}>
+                                    <Select data={multiSigs} placeholder="Select a safe" required searchable
+                                            label="Select a safe"
+                                            {...form.getInputProps("safeAddress")}
+                                            styles={(theme) => selectStyle(theme)}/>
+                                    <Select data={selectData} placeholder="Select a function" required searchable
+                                            label="Select a function"
+                                            {...form.getInputProps("functionName")}
+                                            styles={(theme) => selectStyle(theme)}/>
+                                    {selectedFunctionComponent}
+                                    {selectedFunctionComponent &&
+                                        <>
+                                            <TextInput my="sm" placeholder="Enter the value" required
+                                                       label="Enter the amount you want to send (Leave 0 if no amount has to be sent)" {...form.getInputProps("value")}
+                                                       styles={(theme) => style(theme)}/>
+                                            <Button loading={loading} fullWidth type="submit" color="red" mt="md"
+                                                    styles={(theme) => ({
+                                                        root: {
+                                                            backgroundColor: theme.colors.violet[6],
+                                                            "&:hover": {
+                                                                backgroundColor: `${theme.colors.violet[4]} !important`,
+                                                                color: `${theme.colors.blueTheme[1]} !important`,
+                                                            },
+                                                        }
+                                                    })}>
+                                                Create Proposal
+                                            </Button>
+                                        </>}
+                                </form>
+                            </Paper>
+                        </Tabs.Panel>
+                    </StyledTabs>
+                </Container>
             </CustomSkeleton>
         </Layout>
     )

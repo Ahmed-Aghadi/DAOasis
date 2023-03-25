@@ -16,7 +16,7 @@ import {
     IconSelector,
     IconChevronDown,
     IconChevronUp,
-    IconSearch,
+    IconSearch, IconError404,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import CreateProposalModal from "@/components/CreateProposalModal";
@@ -240,50 +240,53 @@ export function ProposalTable({data, name, safeAddress, chainId}: TableSortProps
                         },
                     }}
                 />
-                <Table
-                    horizontalSpacing="md"
-                    verticalSpacing="xs"
-                >
-                    <thead>
-                    <tr>
-                        <Th
-                            sorted={sortBy === "title"}
-                            reversed={reverseSortDirection}
-                            onSort={() => setSorting("title")}
-
-                        >
-                            Title of Proposal
-                        </Th>
-                        <Th
-                            sorted={sortBy === "creator"}
-                            reversed={reverseSortDirection}
-                            onSort={() => setSorting("creator")}
-                        >
-                            Creator of Proposal
-                        </Th>
-                        <Th
-                            sorted={sortBy === "createdAt"}
-                            reversed={reverseSortDirection}
-                            onSort={() => setSorting("createdAt")}
-                        >
-                            Created At
-                        </Th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {rows.length > 0 ? (
-                        rows
-                    ) : (
+                {rows.length === 0 && (
+                    <Center>
+                        <div>
+                            <Center>
+                                <IconError404 size="142" color="white"/>
+                            </Center>
+                            <Text color="white" size="xl" mt="md">
+                                There are no proposals yet.
+                            </Text>
+                        </div>
+                    </Center>
+                )}
+                {rows.length > 0 &&
+                    <Table
+                        horizontalSpacing="md"
+                        verticalSpacing="xs"
+                    >
+                        <thead>
                         <tr>
-                            <td>
-                                <Text weight={500} align="left" sx={{color: "#3304ba"}}>
-                                    Nothing found
-                                </Text>
-                            </td>
+                            <Th
+                                sorted={sortBy === "title"}
+                                reversed={reverseSortDirection}
+                                onSort={() => setSorting("title")}
+
+                            >
+                                Title of Proposal
+                            </Th>
+                            <Th
+                                sorted={sortBy === "creator"}
+                                reversed={reverseSortDirection}
+                                onSort={() => setSorting("creator")}
+                            >
+                                Creator of Proposal
+                            </Th>
+                            <Th
+                                sorted={sortBy === "createdAt"}
+                                reversed={reverseSortDirection}
+                                onSort={() => setSorting("createdAt")}
+                            >
+                                Created At
+                            </Th>
                         </tr>
-                    )}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                        {rows}
+                        </tbody>
+                    </Table>}
             </ScrollArea>
             {modal}
         </Paper>

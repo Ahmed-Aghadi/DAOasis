@@ -53,7 +53,7 @@ const useStyles = createStyles((theme) => ({
 
     header: {
         display: "flex",
-        justifyContent: "space-evenly",
+        justifyContent: "space-between",
         alignItems: "center",
         height: "100%",
         width: "100%",
@@ -174,7 +174,7 @@ export function HeaderResponsive() {
                     </Menu.Item>
                 </Tooltip>
                 <Menu.Item>
-                    <ChainSelect />
+                    <ChainSelect/>
                 </Menu.Item>
                 <Menu.Item
                     icon={<IconLogout size="0.9rem" stroke={1.5} color={theme.colors.gray[7]}/>}
@@ -199,9 +199,11 @@ export function HeaderResponsive() {
     return (
         <Header height={HEADER_HEIGHT} className={classes.root}>
             <Container className={classes.header}>
-                <Link href="/">
-                    <Image src={logo} alt={"logo"} width={300}/>
-                </Link>
+                <div style={{width: "7rem"}}>
+                    <Link href="/">
+                        <Image src={logo} alt={"logo"} width={300}/>
+                    </Link>
+                </div>
                 <Group spacing={5} className={classes.links}>
                     {items}
                 </Group>

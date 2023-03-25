@@ -4,6 +4,7 @@ import {
     ActionIcon,
     Avatar,
     Button,
+    Center,
     CopyButton,
     Group,
     Modal,
@@ -15,7 +16,7 @@ import {
     Tooltip
 } from "@mantine/core";
 import makeBlockie from "ethereum-blockies-base64";
-import {IconCopy} from "@tabler/icons-react";
+import {IconCopy, IconError404} from "@tabler/icons-react";
 import Link from "next/link";
 import CreateSafeForm from "@/components/CreateSafeForm";
 import PolybaseContext from "@/contexts/PolybaseContext";
@@ -66,6 +67,18 @@ export default function SafesOverview() {
                     </Button>
                 </Group>
                 <ScrollArea h={235}>
+                    {polybaseContext.multiSigs!.length === 0 && (
+                        <Center>
+                            <div>
+                                <Center>
+                                    <IconError404 size="142" color="white"/>
+                                </Center>
+                                <Text color="white" size="xl" mt="md">
+                                    You don't have any Safes yet.
+                                </Text>
+                            </div>
+                        </Center>
+                    )}
                     <Table ml={"md"} p={"sm"}>
                         <tbody>
                         {polybaseContext.multiSigs!.map((safe, index) => (
