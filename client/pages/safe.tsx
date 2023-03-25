@@ -286,7 +286,7 @@ export default function Home() {
     )
 
     const originModal = (
-        <Modal opened={modalOpened} onClose={() => setModalOpened(false)} centered radius={"lg"} returnFocus
+        <Modal opened={originModalOpened} onClose={() => setOriginModalOpened(false)} centered radius={"lg"} returnFocus
                title={"Add DAOasis Module Origin"}
                styles={(theme) => ({
                    content: {

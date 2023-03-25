@@ -24,8 +24,8 @@ export type OverviewProps = {
     balance: string
     description?: string
     threshold?: number
-    buttonText: string
-    handleClick : () => void
+    buttonText?: string
+    handleClick? : () => void
 }
 
 export default function Overview({loading, address, name, chainId, balance, description, threshold, buttonText, handleClick}: OverviewProps) {
@@ -76,13 +76,13 @@ export default function Overview({loading, address, name, chainId, balance, desc
                         style={{fontWeight: 700}}>{parseFloat(balance).toFixed(2)}</span> {getChainDetails(chainId).token}
                     </Text>
                 </Flex>
-                    <Button onClick={handleClick} radius="sm" variant="filled" bg="#D6336C" sx={{
+                    {buttonText && <Button onClick={handleClick} radius="sm" variant="filled" bg="#D6336C" sx={{
                         "&:hover": {
                             backgroundColor: "#F06595 !important"
                         }
                     }}>
                         {buttonText}
-                    </Button>
+                    </Button>}
                 </Group>
             </Paper>
         </CustomSkeleton>
