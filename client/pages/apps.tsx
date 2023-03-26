@@ -27,7 +27,7 @@ export default function Home() {
                 </Link>
             </Group>
             <Center>
-                <Grid gutter="md" m="xs">
+                <Grid gutter="md" m="xs"  miw={"85%"}>
                     {appsData?.map((app: any, index: number) => {
                         return (
                             <Grid.Col key={index} xl={4} lg={4} md={6} sm={6}>
