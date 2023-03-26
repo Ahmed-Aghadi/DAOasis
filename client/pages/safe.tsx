@@ -28,8 +28,8 @@ import myModuleMastercopyDeployment from "@/constants/myModuleMastercopyDeployme
 import {enableSafeModule} from "@/lib/safeModule";
 import {showNotification} from "@mantine/notifications";
 import {getPendingTx, proposeModuleTransaction, proposeTransaction} from "@/lib/safeTransactions";
-import { getConnextAddress } from "@/lib/getConnextAddress";
-import { getDomainId } from "@/lib/getDomainId";
+import {getConnextAddress} from "@/lib/getConnextAddress";
+import {getDomainId} from "@/lib/getDomainId";
 
 export default function Home() {
     const safeContext = useContext(SafeAuthContext);
@@ -138,16 +138,14 @@ export default function Home() {
             chain: "",
         },
         validate: {
-            address: (value) =>
-                ethers.utils.isAddress(value!)
-                    ? undefined
-                    : "Invalid address",
+            address: (value) => ethers.utils.isAddress(value!) ? undefined : "Invalid address",
             chain: (value) => value ? undefined : "Invalid chain",
         },
         validateInputOnChange: true,
     });
 
     const handleSubmit = async (values: { address: string, chain: string }) => {
+        console.log("click")
         setSubmitting(true);
         try {
             const {expectedModuleAddress, safeTransactionData} = enableSafeModule(
@@ -253,7 +251,10 @@ export default function Home() {
             <Text italic color="#FF6B6B" fw={600} mb={"xs"}>
                 Note: The cross-chain module supports only testnet-testnet and mainnet-mainnet interaction.
             </Text>
-            <form onSubmit={form.onSubmit(async (values) => await handleSubmit(values))}>
+            <form onSubmit={form.onSubmit(async (values) => {
+                console.log("click")
+                await handleSubmit(values)
+            })}>
                 <TextInput
                     placeholder={"Address of Safe on other chain"}
                     label={`Address`} required
@@ -271,15 +272,23 @@ export default function Home() {
                     my="sm" placeholder="Enter the chain ID" required
                     label="Contract Chain ID" {...form.getInputProps("chainId")}
                     styles={(theme) => selectStyle(theme)}/>
-                <Button loading={submitting} fullWidth type="submit" color="red" mt="md" styles={(theme) => ({
-                    root: {
-                        backgroundColor: theme.colors.violet[6],
-                        "&:hover": {
-                            backgroundColor: `${theme.colors.violet[4]} !important`,
-                            color: `${theme.colors.blueTheme[1]} !important`,
-                        },
-                    }
-                })}>
+                <Button loading={submitting} fullWidth type="submit" color="red" mt="md"
+                        onClick={async (event) => {
+                            event.preventDefault()
+                            console.log("click")
+                            form.validate()
+                            await handleSubmit(form.values)
+                        }
+                }
+                        styles={(theme) => ({
+                            root: {
+                                backgroundColor: theme.colors.violet[6],
+                                "&:hover": {
+                                    backgroundColor: `${theme.colors.violet[4]} !important`,
+                                    color: `${theme.colors.blueTheme[1]} !important`,
+                                },
+                            }
+                        })}>
                     Enable Safe Module
                 </Button>
             </form>
@@ -393,7 +402,8 @@ export default function Home() {
                         radius="md"
                         height={"100%"}
                     >
-                        {!loading && <ProposalTable data={proposals!} name={name} chainId={chainId} safeAddress={router.query.address as string}/>}
+                        {!loading && <ProposalTable data={proposals!} name={name} chainId={chainId}
+                                                    safeAddress={router.query.address as string}/>}
                     </CustomSkeleton>
                 </SimpleGrid>
             </Center>
