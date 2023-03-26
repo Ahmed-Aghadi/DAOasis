@@ -33,6 +33,10 @@ Overall, DAOasis provides a comprehensive solution for streamlining workflow and
 
 [Connext Cross Chain Transaction](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/getCrossChainTransaction.ts)
 
+[Connext Deploy MasterCopy Module](https://github.com/Suhel-Kap/DAOasis/blob/main/DAOasis-ZodiacXconnext/deploy/01_mastercopy_module.ts)
+
+[Connext Deploy Module with proxy + enable the module to the safe (batch transaction)](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/safeModule.ts)
+
 [Connext Get Domain ID](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/getDomainId.ts)
 
 [Connext Get Address](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/getConnextAddress.ts)
