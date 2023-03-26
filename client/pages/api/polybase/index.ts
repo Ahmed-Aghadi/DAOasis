@@ -404,6 +404,7 @@ export default async function handler(
             res.status(400).json({ response: "Invalid collection" });
             return;
         }
+        return;
     } else if (req.method === "PATCH") {
         const { id } = body;
         if (!id) {
