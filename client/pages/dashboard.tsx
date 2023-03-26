@@ -16,6 +16,8 @@ import {style} from "@/components/CreateProposalTxn";
 import {IconChevronDown} from "@tabler/icons-react";
 import {selectStyle} from "@/pages/create-app";
 import axios from "axios";
+import Tokens from "@/components/Tokens";
+import Transactions from "@/components/Transactions";
 
 export default function Dashboard() {
     const [balance, setBalance] = useState("0.00")
@@ -24,6 +26,7 @@ export default function Dashboard() {
     const [submitting, setSubmitting] = useState(false);
     const [tokens, setTokens] = useState<any[]>([])
     const [txns, setTxns] = useState<any[]>([])
+    const [accountInfoLoading, setAccountInfoLoading] = useState(true)
 
     const safeContext = useContext(SafeAuthContext);
     const userContext = useContext(PolybaseContext);
@@ -49,8 +52,9 @@ export default function Dashboard() {
             address: safeContext.safeAuthSignInResponse?.eoa
         })
         setTokens(res.data.tokens)
-        const txns = [...res.data.incomingTxn, ...res.data.outgoingTxn]
+        const txns = res.data.incomingTxn
         setTxns(txns)
+        setAccountInfoLoading(false)
     }
 
     console.log("TOKENS: ", tokens)
@@ -165,6 +169,8 @@ export default function Dashboard() {
                 >
                     <Overview loading={loading} balance={balance} name={userContext.user?.name!} address={safeContext.safeAuthSignInResponse?.eoa!} chainId={safeContext.safeAuthSignInResponse?.chainId!} buttonText={"Send Tokens"} handleClick={handleClick} />
                     <SafesOverview />
+                    <Tokens loading={accountInfoLoading} tokens={tokens} />
+                    <Transactions loading={accountInfoLoading} txns={txns} chainId={safeContext.safeAuthSignInResponse?.chainId!} />
                 </SimpleGrid>
             </Center>
             {modal}

@@ -5,7 +5,6 @@ import axios from "axios";
 type Data = {
     tokens: { name: string, balance: string, symbol: string }[],
     incomingTxn?: any,
-    outgoingTxn?: any
 }
 
 const getConfig = (chainId: string) => {
@@ -84,8 +83,7 @@ export default async function handler(
 
         res.send({
             tokens: resultBalance,
-            incomingTxn: incomingTxn.transfers,
-            outgoingTxn: outgoingTxn.transfers
+            incomingTxn: [...incomingTxn.transfers, ...outgoingTxn.transfers],
         })
     }
     if (chainId === "0x64") {
