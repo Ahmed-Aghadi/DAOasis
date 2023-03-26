@@ -175,7 +175,7 @@ const schema = `
 
 const signInPolybase = () => {
     const db = new Polybase({
-        defaultNamespace: "polybase-test-v0.0",
+        defaultNamespace: "polybase-test-v0.1",
     });
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
