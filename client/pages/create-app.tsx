@@ -227,7 +227,7 @@ export default function CreateApp() {
                                     },
                                 }
                             })}>
-                        Create Proposal
+                        Create App
                     </Button>
                 </form>
             </Center>
