@@ -57,6 +57,15 @@ export const createProfile = async (profile: Profile) => {
 
 export const createSafe = async (safe: Safe) => {
     const { id, name, description, owners, threshold, chainId } = safe;
+    console.log({
+        id,
+        collection: "MultiSig",
+        name,
+        description,
+        owners,
+        threshold,
+        chainId,
+    })
     const response = await axios.post(`/api/polybase`, {
         id,
         collection: "MultiSig",

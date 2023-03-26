@@ -13,7 +13,7 @@ interface Config {
 const config: Config = {
     DEPLOYER_ADDRESS_PRIVATE_KEY: process.env.NEXT_PUBLIC_PRIVATE_KEY as string,
     DEPLOY_SAFE: {
-        SALT_NONCE: '1'
+        SALT_NONCE: Math.floor(Math.random() * 9999).toString()
     }
 }
 
@@ -21,8 +21,6 @@ export const safeCreate = async (owners: string[], threshold: number, chainId: s
     const rpc = getRpc(chainId)
     const provider = new ethers.providers.JsonRpcProvider(rpc)
     const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
-
-    console.log("Owners:", owners)
 
     const ethAdapter = new EthersAdapter({
         ethers,

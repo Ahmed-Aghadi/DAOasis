@@ -1,6 +1,6 @@
-import { SafeAccountConfig, SafeDeploymentConfig, SafeFactory } from '@safe-global/safe-core-sdk'
+import {SafeAccountConfig, SafeDeploymentConfig, SafeFactory} from '@safe-global/safe-core-sdk'
 import EthersAdapter from '@safe-global/safe-ethers-lib'
-import { ethers } from 'ethers'
+import {ethers} from 'ethers'
 import {NextApiRequest, NextApiResponse} from "next";
 import {getRpc} from "@/lib/getRpc";
 
@@ -14,12 +14,12 @@ interface Config {
 const config: Config = {
     DEPLOYER_ADDRESS_PRIVATE_KEY: process.env.PRIVATE_KEY as string,
     DEPLOY_SAFE: {
-        SALT_NONCE: '1'
+        SALT_NONCE: Math.floor(Math.random() * 9999).toString()
     }
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const {owners, threshold, chainId} = req.body as {owners: string[], threshold: number, chainId: string}
+    const {owners, threshold, chainId} = req.body as { owners: string[], threshold: number, chainId: string }
     const rpc = getRpc(chainId)
     const provider = new ethers.providers.JsonRpcProvider(rpc)
     const deployerSigner = new ethers.Wallet(config.DEPLOYER_ADDRESS_PRIVATE_KEY, provider)
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
 
     // Create SafeFactory instance
-    const safeFactory = await SafeFactory.create({ ethAdapter })
+    const safeFactory = await SafeFactory.create({ethAdapter})
 
     // Config of the deployed Safe
     const safeAccountConfig: SafeAccountConfig = {
@@ -51,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     function callback(txHash: string) {
         console.log('Transaction hash:', txHash)
+        res.status(200).json({safeAddress: predictedDeployAddress})
     }
 
     // Deploy Safe
@@ -63,5 +64,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Predicted deployed address:', predictedDeployAddress)
     console.log('Deployed Safe:', safe.getAddress())
 
-    res.status(200).json({safeAddress: safe.getAddress()})
 }

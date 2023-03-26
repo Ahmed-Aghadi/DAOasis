@@ -82,7 +82,13 @@ export default function CreateSafeForm() {
                 owners as string[],
                 values.threshold,
                 safeContext.safeAuthSignInResponse?.chainId!);
-            console.log(safeAddress);
+            // const response = await axios.post("/api/createSafe", {
+            //     threshold: values.threshold,
+            //     owners: owners,
+            //     chainId: safeContext.safeAuthSignInResponse?.chainId,
+            // });
+            // const safeAddress = response.data.safeAddress;
+            // console.log(safeAddress);
 
             const safePolybaseResponse = await createSafe({
                 id: safeAddress as `0x${string}`,
