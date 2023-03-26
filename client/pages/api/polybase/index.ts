@@ -560,5 +560,5 @@ export default async function handler(
     }
 
     // invalid method
-    res.status(400).json({ response: "Invalid method" });
+    return res.status(400).json({ response: "Invalid method" });
 }
