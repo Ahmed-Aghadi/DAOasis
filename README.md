@@ -37,6 +37,12 @@ Overall, DAOasis provides a comprehensive solution for streamlining workflow and
 
 [Connext Deploy Module with proxy + enable the module to the safe (batch transaction)](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/safeModule.ts)
 
+[DAOasis Module on Gnosis Mainet](https://gnosisscan.io/address/0x364c47603Ed669168FE1Cf53a688E6aeB629aF51#code)
+
+[DAOasis Module on Polygon Mainet](https://polygonscan.com/address/0x364c47603Ed669168FE1Cf53a688E6aeB629aF51#code)
+
+[DAOasis Module on Goerli Testnet](https://goerli.etherscan.io/address/0x364c47603Ed669168FE1Cf53a688E6aeB629aF51#code)
+
 [Connext Get Domain ID](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/getDomainId.ts)
 
 [Connext Get Address](https://github.com/Suhel-Kap/DAOasis/blob/main/client/lib/getConnextAddress.ts)
