@@ -191,7 +191,7 @@ export default function Home() {
             await addTxnHash(res.response.data.id, txHash)
             setLoading(false)
             setTimeout(() => {
-                router.push(`/safe?id=${values.safeAddress}`)
+                router.push(`/safe?address=${values.safeAddress}`)
             }, 1500)
 
         } catch (e: any) {
