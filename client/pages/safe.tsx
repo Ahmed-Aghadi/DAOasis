@@ -314,7 +314,7 @@ export default function Home() {
                    }
                })}>
             <Text italic color="#FF6B6B" fw={600} mb={"xs"}>
-                By enabling the cross-chain connext-zodiac module, the safe enabled on the other chain will be able to
+                By adding origin in the cross-chain connext-zodiac module, the safe enabled on the other chain will be able to
                 make transactions through the current safe. It will also enable you to send wETH to this safe. If you
                 understand and are comfortable with these risks, you may proceed to enable the cross-chain
                 connext-zodiac module.
@@ -349,7 +349,7 @@ export default function Home() {
                         },
                     }
                 })}>
-                    Enable Safe Module
+                    Add Origin
                 </Button>
             </form>
         </Modal>
