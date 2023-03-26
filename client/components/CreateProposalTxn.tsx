@@ -292,6 +292,85 @@ export default function CreateProposalTxn() {
                                 handleProposalSubmit(values)
                             )}
                         >
+                            <Checkbox
+                                mt="md"
+                                {...txnProposalForm.getInputProps("enable")}
+                                label="Cross Chain Transaction"
+                                styles={(theme) => ({
+                                    label: {
+                                        color: theme.colors.blueTheme[4],
+                                    },
+                                    input: {
+                                        backgroundColor:
+                                            theme.colors.blueTheme[3],
+                                        "&:checked": {
+                                            backgroundColor:
+                                                theme.colors.blueTheme[0],
+                                            borderColor:
+                                                theme.colors.blueTheme[0],
+                                        },
+                                    },
+                                })}
+                            />
+                            {txnProposalForm.values.enable && (
+                                <>
+                                    <TextInput
+                                        placeholder={
+                                            "Address of Safe on other chain"
+                                        }
+                                        label={`Address`}
+                                        required
+                                        {...txnProposalForm.getInputProps(
+                                            `safeAddress`
+                                        )}
+                                        styles={(theme) => style(theme)}
+                                    />
+                                    <Select
+                                        data={[
+                                            {
+                                                label: "Gnosis",
+                                                value: "0x64",
+                                            },
+                                            {
+                                                label: "Goerli",
+                                                value: "0x5",
+                                            },
+                                            {
+                                                label: "Polygon",
+                                                value: "0x89",
+                                            },
+                                            {
+                                                label: "Optimism",
+                                                value: "0xa",
+                                            },
+                                        ]}
+                                        rightSection={
+                                            <IconChevronDown
+                                                color="#fff"
+                                                size="1rem"
+                                            />
+                                        }
+                                        my="sm"
+                                        placeholder="Enter the chain ID"
+                                        required
+                                        label="Contract Chain ID"
+                                        {...txnProposalForm.getInputProps(
+                                            "chainId"
+                                        )}
+                                        styles={(theme) => selectStyle(theme)}
+                                    />
+                                    <TextInput
+                                        my="sm"
+                                        placeholder="Enter the amount of wETH to send to safe"
+                                        required
+                                        label="Enter the amount you want to send (Leave 0 if no amount has to be sent)"
+                                        {...txnProposalForm.getInputProps(
+                                            "amountWeth"
+                                        )}
+                                        styles={(theme) => style(theme)}
+                                    />
+                                </>
+                            )}
                             <TextInput
                                 my="sm"
                                 placeholder="Enter the contract address"
@@ -374,112 +453,26 @@ export default function CreateProposalTxn() {
                                         )}
                                         styles={(theme) => style(theme)}
                                     />
-                                    <Checkbox
-                                        {...txnProposalForm.getInputProps(
-                                            "enable"
-                                        )}
-                                        label="Cross Chain Transaction"
-                                        styles={(theme) => ({
-                                            label: {
-                                                color: theme.colors
-                                                    .blueTheme[4],
-                                            },
-                                            input: {
-                                                backgroundColor:
-                                                    theme.colors.blueTheme[3],
-                                                "&:checked": {
-                                                    backgroundColor:
-                                                        theme.colors
-                                                            .blueTheme[0],
-                                                    borderColor:
-                                                        theme.colors
-                                                            .blueTheme[0],
-                                                },
-                                            },
-                                        })}
-                                    />
-                                    {txnProposalForm.values.enable && (
-                                        <>
-                                            <TextInput
-                                                placeholder={
-                                                    "Address of Safe on other chain"
-                                                }
-                                                label={`Address`}
-                                                required
-                                                {...txnProposalForm.getInputProps(
-                                                    `safeAddress`
-                                                )}
-                                                styles={(theme) => style(theme)}
-                                            />
-                                            <Select
-                                                data={[
-                                                    {
-                                                        label: "Gnosis",
-                                                        value: "0x64",
-                                                    },
-                                                    {
-                                                        label: "Goerli",
-                                                        value: "0x5",
-                                                    },
-                                                    {
-                                                        label: "Polygon",
-                                                        value: "0x89",
-                                                    },
-                                                    {
-                                                        label: "Optimism",
-                                                        value: "0xa",
-                                                    },
-                                                ]}
-                                                rightSection={
-                                                    <IconChevronDown
-                                                        color="#fff"
-                                                        size="1rem"
-                                                    />
-                                                }
-                                                my="sm"
-                                                placeholder="Enter the chain ID"
-                                                required
-                                                label="Contract Chain ID"
-                                                {...txnProposalForm.getInputProps(
-                                                    "chainId"
-                                                )}
-                                                styles={(theme) =>
-                                                    selectStyle(theme)
-                                                }
-                                            />
-                                            <TextInput
-                                                my="sm"
-                                                placeholder="Enter the amount of wETH to send to safe"
-                                                required
-                                                label="Enter the amount you want to send (Leave 0 if no amount has to be sent)"
-                                                {...txnProposalForm.getInputProps(
-                                                    "amountWeth"
-                                                )}
-                                                styles={(theme) => style(theme)}
-                                            />
-                                        </>
-                                    )}
-                                    <Button
-                                        loading={loading}
-                                        fullWidth
-                                        type="submit"
-                                        color="red"
-                                        mt="md"
-                                        styles={(theme) => ({
-                                            root: {
-                                                backgroundColor:
-                                                    theme.colors.violet[6],
-                                                "&:hover": {
-                                                    backgroundColor: `${theme.colors.violet[4]} !important`,
-                                                    color: `${theme.colors.blueTheme[1]} !important`,
-                                                },
-                                            },
-                                        })}
-                                    >
-                                        Create Proposal
-                                    </Button>
                                 </>
                             )}
+                            <Button
+                                loading={loading}
+                                fullWidth
+                                type="submit"
+                                color="red"
+                                mt="md"
+                                styles={(theme) => ({
+                                    root: {
+                                        backgroundColor: theme.colors.violet[6],
+                                        "&:hover": {
+                                            backgroundColor: `${theme.colors.violet[4]} !important`,
+                                            color: `${theme.colors.blueTheme[1]} !important`,
+                                        },
+                                    },
+                                })}
+                            >
+                                Create Proposal
+                            </Button>
                         </form>
                     </Accordion.Panel>
                 </Accordion.Item>
