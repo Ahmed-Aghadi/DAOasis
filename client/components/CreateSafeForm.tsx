@@ -17,6 +17,7 @@ import {showNotification, updateNotification} from "@mantine/notifications";
 import {createSafe} from "@/lib/polybase";
 import PolybaseContext, {MultiSig} from "@/contexts/PolybaseContext";
 import {useRouter} from "next/router";
+import {safeCreate} from "@/lib/safeCreate";
 
 const style = (theme: any) => ({
     input: {
@@ -77,16 +78,14 @@ export default function CreateSafeForm() {
         });
         const owners = values.owners.map((owner) => owner.address);
         try {
-            const response = await axios.post("/api/createSafe", {
-                threshold: values.threshold,
-                owners: owners,
-                chainId: safeContext.safeAuthSignInResponse?.chainId,
-            });
-            const safeAddress = response.data.safeAddress;
+            const safeAddress = await safeCreate(
+                owners as string[],
+                values.threshold,
+                safeContext.safeAuthSignInResponse?.chainId!);
             console.log(safeAddress);
 
             const safePolybaseResponse = await createSafe({
-                id: safeAddress,
+                id: safeAddress as `0x${string}`,
                 name: values.name,
                 description: values.description,
                 owners: owners as `0x${string}`[],
